@@ -46,16 +46,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Prevent pull-to-refresh on mobile
-    document.body.addEventListener('touchmove', function(e) {
-        if (e.target.closest('.content-area')) {
-            const scrollTop = document.querySelector('.content-area').scrollTop;
-            if (scrollTop <= 0) {
-                e.preventDefault();
-            }
-        }
-    }, { passive: false });
-
     // ==================== SETTINGS FUNCTIONALITY ====================
 
     // Settings navigation

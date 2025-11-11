@@ -35,6 +35,8 @@ body {
     overflow: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overscroll-behavior-y: none;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* App Container */
@@ -42,21 +44,22 @@ body {
     max-width: 428px;
     margin: 0 auto;
     height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile browsers */
     display: flex;
     flex-direction: column;
     background-color: #ffffff;
     position: relative;
+    overflow: hidden;
 }
 
 /* Content Area */
 .content-area {
     flex: 1;
-    overflow-y: auto;
+    overflow-y: scroll;
     overflow-x: hidden;
     padding-bottom: 80px;
     -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
-    overscroll-behavior: contain;
+    position: relative;
 }
 
 /* Screen */
@@ -65,19 +68,10 @@ body {
     min-height: calc(100vh - 80px);
     padding: 20px;
     animation: fadeIn 0.2s ease-in-out;
-    overflow-y: auto;
-    overflow-x: hidden;
 }
 
 .screen.active {
     display: block;
-}
-
-/* Ensure all screens are scrollable */
-.screen.sub-screen {
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
 }
 
 @keyframes fadeIn {
@@ -1062,10 +1056,9 @@ html, body {
     background-color: #ffffff;
     padding: 12px;
     padding-bottom: 100px;
-    overflow-y: auto;
+    overflow-y: scroll;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
 }
 
 .preview-header {
