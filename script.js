@@ -282,123 +282,71 @@ document.addEventListener('DOMContentLoaded', function() {
     const cameraView = document.getElementById('camera-view');
     const voiceView = document.getElementById('voice-view');
     const previewView = document.getElementById('preview-view');
-    const cameraPlaceholder = document.querySelector('.camera-placeholder');
+    const cameraPlaceholder = document.getElementById('camera-placeholder');
+    const photoInput = document.getElementById('photo-input');
 
-    // Initialize camera when capture screen is active
-    function initializeCamera() {
-        // Create video element if it doesn't exist
-        let videoElement = document.getElementById('camera-video');
-        if (!videoElement) {
-            videoElement = document.createElement('video');
-            videoElement.id = 'camera-video';
-            videoElement.autoplay = true;
-            videoElement.playsinline = true;
-            videoElement.style.width = '100%';
-            videoElement.style.height = '100%';
-            videoElement.style.objectFit = 'cover';
-            cameraPlaceholder.innerHTML = '';
-            cameraPlaceholder.appendChild(videoElement);
-        }
+    // Click on camera placeholder or snap button to open file picker/camera
+    if (cameraPlaceholder) {
+        cameraPlaceholder.addEventListener('click', function() {
+            photoInput.click();
+        });
+    }
 
-        // Request camera access
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({
-                video: {
-                    facingMode: 'environment', // Use back camera on mobile
-                    width: { ideal: 1920 },
-                    height: { ideal: 1080 }
-                }
-            })
-            .then(function(stream) {
-                cameraStream = stream;
-                videoElement.srcObject = stream;
-            })
-            .catch(function(error) {
-                console.error('Camera error:', error);
-                cameraPlaceholder.innerHTML = `
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                        <circle cx="12" cy="13" r="4"></circle>
-                    </svg>
-                    <p>Camera access denied or not available</p>
-                `;
-            });
-        } else {
+    if (snapButton) {
+        snapButton.addEventListener('click', function() {
+            photoInput.click();
+        });
+    }
+
+    // Handle photo selection/capture
+    if (photoInput) {
+        photoInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+
+                reader.onload = function(event) {
+                    capturedImageData = event.target.result;
+
+                    // Update camera placeholder to show selected image
+                    cameraPlaceholder.innerHTML = `<img src="${capturedImageData}" style="width: 100%; height: 100%; object-fit: cover;">`;
+
+                    // Update frozen photo in voice view
+                    const frozenPhoto = document.querySelector('.frozen-photo');
+                    frozenPhoto.innerHTML = `<img src="${capturedImageData}" style="width: 100%; height: 100%; object-fit: cover;">`;
+
+                    // Also update preview thumbnail
+                    const previewThumbnail = document.getElementById('preview-thumbnail');
+                    previewThumbnail.innerHTML = `<img src="${capturedImageData}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">`;
+
+                    // Hide camera, show voice interface
+                    cameraView.style.display = 'none';
+                    voiceView.style.display = 'flex';
+
+                    // Start mock voice recognition
+                    startMockVoiceRecognition();
+                };
+
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    // Reset camera placeholder
+    function resetCameraPlaceholder() {
+        if (cameraPlaceholder) {
             cameraPlaceholder.innerHTML = `
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
                     <circle cx="12" cy="13" r="4"></circle>
                 </svg>
-                <p>Camera not supported on this device</p>
+                <p>Tap to take photo or choose from gallery</p>
             `;
         }
-    }
-
-    // Stop camera stream
-    function stopCamera() {
-        if (cameraStream) {
-            cameraStream.getTracks().forEach(track => track.stop());
-            cameraStream = null;
+        // Reset file input so same file can be selected again
+        if (photoInput) {
+            photoInput.value = '';
         }
-    }
-
-    // Initialize camera when navigating to capture screen
-    navItems.forEach(item => {
-        item.addEventListener('click', function() {
-            const screenId = this.getAttribute('data-screen');
-            if (screenId === 'capture-screen') {
-                setTimeout(() => {
-                    initializeCamera();
-                }, 200);
-            } else {
-                // Stop camera when leaving capture screen
-                stopCamera();
-            }
-        });
-    });
-
-    // Initialize camera on page load if capture screen is active
-    if (document.getElementById('capture-screen').classList.contains('active')) {
-        setTimeout(() => {
-            initializeCamera();
-        }, 500);
-    }
-
-    // Snap button - capture photo and switch to voice interface
-    if (snapButton) {
-        snapButton.addEventListener('click', function() {
-            // Capture the photo
-            const videoElement = document.getElementById('camera-video');
-            if (videoElement && videoElement.srcObject) {
-                // Create canvas to capture image
-                const canvas = document.createElement('canvas');
-                canvas.width = videoElement.videoWidth;
-                canvas.height = videoElement.videoHeight;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(videoElement, 0, 0);
-
-                // Store captured image
-                capturedImageData = canvas.toDataURL('image/jpeg', 0.8);
-
-                // Update frozen photo in voice view
-                const frozenPhoto = document.querySelector('.frozen-photo');
-                frozenPhoto.innerHTML = `<img src="${capturedImageData}" style="width: 100%; height: 100%; object-fit: cover;">`;
-
-                // Also update preview thumbnail
-                const previewThumbnail = document.getElementById('preview-thumbnail');
-                previewThumbnail.innerHTML = `<img src="${capturedImageData}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">`;
-            }
-
-            // Stop camera
-            stopCamera();
-
-            // Hide camera, show voice interface
-            cameraView.style.display = 'none';
-            voiceView.style.display = 'flex';
-
-            // Start mock voice recognition
-            startMockVoiceRecognition();
-        });
     }
 
     // Mock voice recognition
@@ -534,12 +482,12 @@ document.addEventListener('DOMContentLoaded', function() {
             // Clear captured image
             capturedImageData = null;
 
+            // Reset camera placeholder
+            resetCameraPlaceholder();
+
             // Hide preview, show camera
             previewView.style.display = 'none';
             cameraView.style.display = 'flex';
-
-            // Restart camera
-            initializeCamera();
         });
     }
 
