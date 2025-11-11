@@ -28,6 +28,11 @@ document.addEventListener('DOMContentLoaded', function() {
             activeNavItem.classList.add('active');
         }
 
+        // Reset capture screen when navigating to it
+        if (targetScreenId === 'capture-screen') {
+            resetCaptureScreen();
+        }
+
         // Scroll to top of content area
         const contentArea = document.getElementById('content');
         contentArea.scrollTop = 0;
@@ -280,7 +285,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Camera elements
     const snapButton = document.getElementById('snap-button');
     const cameraView = document.getElementById('camera-view');
-    const voiceView = document.getElementById('voice-view');
     const previewView = document.getElementById('preview-view');
     const cameraPlaceholder = document.getElementById('camera-placeholder');
     const photoInput = document.getElementById('photo-input');
@@ -311,20 +315,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Update camera placeholder to show selected image
                     cameraPlaceholder.innerHTML = `<img src="${capturedImageData}" style="width: 100%; height: 100%; object-fit: cover;">`;
 
-                    // Update frozen photo in voice view
-                    const frozenPhoto = document.querySelector('.frozen-photo');
-                    frozenPhoto.innerHTML = `<img src="${capturedImageData}" style="width: 100%; height: 100%; object-fit: cover;">`;
-
-                    // Also update preview thumbnail
+                    // Update preview thumbnail
                     const previewThumbnail = document.getElementById('preview-thumbnail');
                     previewThumbnail.innerHTML = `<img src="${capturedImageData}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">`;
 
-                    // Hide camera, show voice interface
+                    // Hide camera, show preview directly
                     cameraView.style.display = 'none';
-                    voiceView.style.display = 'flex';
+                    previewView.style.display = 'flex';
 
-                    // Start mock voice recognition
-                    startMockVoiceRecognition();
+                    // Scroll to top of preview
+                    previewView.scrollTop = 0;
                 };
 
                 reader.readAsDataURL(file);
@@ -349,145 +349,48 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Mock voice recognition
-    function startMockVoiceRecognition() {
-        const micIcon = document.getElementById('microphone-icon');
-        const transcript = document.getElementById('voice-transcript');
+    // Reset entire capture screen (camera and preview)
+    function resetCaptureScreen() {
+        // Clear captured image data
+        capturedImageData = null;
 
-        // Add listening animation
-        micIcon.classList.add('listening');
+        // Reset camera placeholder to empty state
+        resetCameraPlaceholder();
 
-        // Simulate listening delay
-        setTimeout(() => {
-            // Mock transcript examples (random selection for demo)
-            const mockTranscripts = [
-                { text: "Groceries 58 John Visa", amount: "58", category: "Groceries", member: "John", source: "Visa" },
-                { text: "Food 25 Jane Cash", amount: "25", category: "Food", member: "Jane", source: "Cash" },
-                { text: "Transport 15 John Chase", amount: "15", category: "Transport", member: "John", source: "Chase" },
-                { text: "Utilities 120 Jane Visa", amount: "120", category: "Utilities", member: "Jane", source: "Visa" }
-            ];
-
-            const randomTranscript = mockTranscripts[Math.floor(Math.random() * mockTranscripts.length)];
-
-            // Show transcript
-            transcript.textContent = `"${randomTranscript.text}"`;
-
-            // Stop listening animation
-            micIcon.classList.remove('listening');
-
-            // Auto-fill preview card after brief delay
-            setTimeout(() => {
-                autoFillPreviewCard(randomTranscript);
-            }, 1000);
-        }, 2500);
-    }
-
-    // Auto-fill preview card based on voice input
-    function autoFillPreviewCard(data) {
-        // Fill amount - ensure it's a clean number
-        const cleanAmount = String(data.amount).replace(/[^\d.]/g, '');
-        document.getElementById('expense-amount').value = cleanAmount;
-
-        // Select category
-        const categoryMatch = {
-            'groceries': '3',
-            'food': '1',
-            'transport': '2',
-            'utilities': '5',
-            'home': '4'
-        };
-        const categoryId = categoryMatch[data.category.toLowerCase()];
-        if (categoryId) {
-            const categoryChips = document.querySelectorAll('#category-chips .chip');
-            categoryChips.forEach(chip => {
-                chip.classList.remove('active');
-                if (chip.getAttribute('data-category') === categoryId) {
-                    chip.classList.add('active');
-                }
-            });
+        // Reset preview thumbnail to empty state
+        const previewThumbnail = document.getElementById('preview-thumbnail');
+        if (previewThumbnail) {
+            previewThumbnail.innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+            `;
         }
 
-        // Select member
-        const memberMatch = {
-            'john': '1',
-            'jane': '2',
-            'janaka': '1'
-        };
-        const memberId = memberMatch[data.member.toLowerCase()];
-        if (memberId) {
-            const memberChips = document.querySelectorAll('#member-chips .chip');
-            memberChips.forEach(chip => {
-                chip.classList.remove('active');
-                if (chip.getAttribute('data-member') === memberId) {
-                    chip.classList.add('active');
-                }
-            });
+        // Clear form fields
+        const amountInput = document.getElementById('expense-amount');
+        if (amountInput) {
+            amountInput.value = '';
         }
 
-        // Select source
-        const sourceMatch = {
-            'visa': '1',
-            'chase': '1',
-            'cash': '2'
-        };
-        const sourceId = sourceMatch[data.source.toLowerCase()];
-        if (sourceId) {
-            const sourceChips = document.querySelectorAll('#source-chips .chip');
-            sourceChips.forEach(chip => {
-                chip.classList.remove('active');
-                if (chip.getAttribute('data-source') === sourceId) {
-                    chip.classList.add('active');
-                }
-            });
+        // Show camera view, hide preview
+        if (cameraView) {
+            cameraView.style.display = 'flex';
         }
-
-        // Show preview card
-        voiceView.style.display = 'none';
-        previewView.style.display = 'flex';
-
-        // Scroll to top of preview
-        previewView.scrollTop = 0;
+        if (previewView) {
+            previewView.style.display = 'none';
+        }
     }
 
-    // Skip voice button - go directly to preview
-    const skipVoiceButton = document.getElementById('skip-voice-button');
-    if (skipVoiceButton) {
-        skipVoiceButton.addEventListener('click', function() {
-            // Stop any ongoing animations
-            const micIcon = document.getElementById('microphone-icon');
-            micIcon.classList.remove('listening');
-
-            // Clear transcript
-            document.getElementById('voice-transcript').textContent = '';
-
-            // Show preview without auto-fill
-            voiceView.style.display = 'none';
-            previewView.style.display = 'flex';
-
-            // Scroll to top of preview
-            previewView.scrollTop = 0;
-        });
-    }
 
     // Discard button - return to camera
     const discardButton = document.getElementById('discard-button');
     if (discardButton) {
         discardButton.addEventListener('click', function() {
-            // Clear form
-            document.getElementById('expense-amount').value = '';
-
-            // Clear transcript
-            document.getElementById('voice-transcript').textContent = '';
-
-            // Clear captured image
-            capturedImageData = null;
-
-            // Reset camera placeholder
-            resetCameraPlaceholder();
-
-            // Hide preview, show camera
-            previewView.style.display = 'none';
-            cameraView.style.display = 'flex';
+            // Reset the entire capture screen
+            resetCaptureScreen();
         });
     }
 
@@ -588,10 +491,8 @@ document.addEventListener('DOMContentLoaded', function() {
             // Show undo toast
             showUndoToast();
 
-            // Clear form and return to camera
-            document.getElementById('expense-amount').value = '';
-            previewView.style.display = 'none';
-            cameraView.style.display = 'flex';
+            // Reset the entire capture screen (clear photo, form, etc.)
+            resetCaptureScreen();
 
             // Switch to home screen after a short delay
             setTimeout(() => {
