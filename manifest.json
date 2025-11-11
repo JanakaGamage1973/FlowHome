@@ -2,9 +2,9 @@
   "name": "FlowHome - Home Expenses Tracker",
   "short_name": "FlowHome",
   "description": "Track household expenses and manage shared finances",
-  "start_url": "/",
+  "start_url": "./",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "background_color": "#C8E6F5",
   "theme_color": "#007AFF",
   "orientation": "portrait",
   "icons": [
