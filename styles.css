@@ -454,24 +454,38 @@ body {
 
 .form-group input,
 .form-group select {
-    padding: 12px 16px;
-    border: 1px solid #e0e0e0;
-    border-radius: 10px;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: 2px solid var(--md-surface-3);
+    border-radius: var(--md-radius-md);
     font-size: 16px;
     font-family: inherit;
-    background-color: #ffffff;
-    color: #1a1a1a;
-    transition: border-color 0.2s ease;
+    background-color: var(--md-surface-1);
+    color: var(--md-on-surface);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--md-elevation-1);
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.form-group select {
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23666666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 44px;
 }
 
 .form-group input:focus,
 .form-group select:focus {
     outline: none;
-    border-color: #007AFF;
+    border-color: var(--md-primary);
+    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1), var(--md-elevation-2);
+    transform: translateY(-1px);
 }
 
 .form-group input::placeholder {
-    color: #c7c7cc;
+    color: var(--md-on-surface-variant);
+    opacity: 0.6;
 }
 
 /* Toggle Switch */
@@ -522,8 +536,8 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #e0e0e0;
-    transition: 0.3s;
+    background-color: var(--md-surface-3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border-radius: 34px;
 }
 
@@ -535,9 +549,9 @@ body {
     left: 2px;
     bottom: 2px;
     background-color: white;
-    transition: 0.3s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border-radius: 50%;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--md-elevation-2);
 }
 
 .toggle-switch.small .toggle-slider:before {
@@ -546,7 +560,7 @@ body {
 }
 
 .toggle-switch input:checked + .toggle-slider {
-    background-color: #34C759;
+    background-color: var(--md-success);
 }
 
 .toggle-switch input:checked + .toggle-slider:before {
@@ -1240,12 +1254,13 @@ body {
     font-weight: 600;
     padding: 8px 8px 8px 0;
     background: none;
-    color: #1a1a1a;
+    color: var(--md-on-surface);
     min-width: 0;
 }
 
 .amount-input-wrapper input::placeholder {
-    color: #c7c7cc;
+    color: var(--md-on-surface-variant);
+    opacity: 0.6;
 }
 
 /* Chip Selector */
@@ -1300,18 +1315,25 @@ body {
 
 /* Date Input */
 .date-input {
-    padding: 10px 14px;
-    border: 1px solid #e0e0e0;
-    border-radius: 10px;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: 2px solid var(--md-surface-3);
+    border-radius: var(--md-radius-md);
     font-size: 16px;
     font-family: inherit;
-    background-color: #ffffff;
-    color: #1a1a1a;
+    background-color: var(--md-surface-1);
+    color: var(--md-on-surface);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--md-elevation-1);
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
 }
 
 .date-input:focus {
     outline: none;
-    border-color: #007AFF;
+    border-color: var(--md-primary);
+    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1), var(--md-elevation-2);
+    transform: translateY(-1px);
 }
 
 /* Save Expense Button */
@@ -1501,15 +1523,16 @@ body {
 
 /* Textarea for Note */
 textarea {
-    padding: 10px 14px;
-    border: 1px solid #e0e0e0;
-    border-radius: 10px;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: 2px solid var(--md-surface-3);
+    border-radius: var(--md-radius-md);
     font-size: 15px;
     font-family: inherit;
-    background-color: #ffffff;
-    color: #1a1a1a;
+    background-color: var(--md-surface-1);
+    color: var(--md-on-surface);
     resize: vertical;
-    transition: border-color 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--md-elevation-1);
 }
 
 #edit-entry-screen textarea {
@@ -1518,11 +1541,14 @@ textarea {
 
 textarea:focus {
     outline: none;
-    border-color: #007AFF;
+    border-color: var(--md-primary);
+    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1), var(--md-elevation-2);
+    transform: translateY(-1px);
 }
 
 textarea::placeholder {
-    color: #c7c7cc;
+    color: var(--md-on-surface-variant);
+    opacity: 0.6;
 }
 
 /* Save and Delete Buttons in Edit Screen */
@@ -1876,19 +1902,29 @@ textarea::placeholder {
 
 .transfer-select {
     width: 100%;
-    padding: 12px 16px;
-    border: 1px solid #e0e0e0;
-    border-radius: 10px;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: 2px solid var(--md-surface-3);
+    border-radius: var(--md-radius-md);
     font-size: 16px;
     font-family: inherit;
-    background-color: #ffffff;
-    color: #1a1a1a;
-    transition: border-color 0.2s ease;
+    background-color: var(--md-surface-1);
+    color: var(--md-on-surface);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--md-elevation-1);
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23666666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 44px;
 }
 
 .transfer-select:focus {
     outline: none;
-    border-color: #007AFF;
+    border-color: var(--md-primary);
+    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1), var(--md-elevation-2);
+    transform: translateY(-1px);
 }
 
 /* Responsive adjustments for Wallets */
@@ -1956,16 +1992,22 @@ textarea::placeholder {
     position: relative;
     display: flex;
     align-items: center;
-    background-color: #f5f5f5;
-    border-radius: 12px;
-    padding: 12px 16px;
+    background-color: var(--md-surface-2);
+    border-radius: var(--md-radius-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    box-shadow: var(--md-elevation-1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.search-input-wrapper:focus-within {
+    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1), var(--md-elevation-2);
 }
 
 .search-input-icon {
     width: 20px;
     height: 20px;
-    stroke: #999;
-    margin-right: 12px;
+    stroke: var(--md-on-surface-variant);
+    margin-right: var(--spacing-sm);
     flex-shrink: 0;
 }
 
@@ -1975,12 +2017,13 @@ textarea::placeholder {
     background: none;
     outline: none;
     font-size: 16px;
-    color: #1a1a1a;
+    color: var(--md-on-surface);
     font-family: inherit;
 }
 
 .search-input::placeholder {
-    color: #999;
+    color: var(--md-on-surface-variant);
+    opacity: 0.6;
 }
 
 .search-clear-btn {
