@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Home Expenses Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Main Content Area -->
+        <div class="content-area" id="content">
+
+            <!-- Home Screen -->
+            <div class="screen active" id="home-screen">
+                <div class="screen-header">
+                    <h1>Home</h1>
+                    <button class="search-icon-btn" id="open-search-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="summary-cards">
+                    <div class="summary-card">
+                        <div class="summary-label">Today's Total</div>
+                        <div class="summary-amount" id="today-total">Rs 0</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-label">This Month</div>
+                        <div class="summary-amount" id="month-total">Rs 0</div>
+                    </div>
+                </div>
+
+                <div class="recent-expenses-container" id="recent-expenses">
+                    <h2 class="section-title">Recent (Last 5)</h2>
+                    <div class="empty-state" id="empty-expenses">
+                        <p>No expenses yet</p>
+                        <p class="empty-hint">Tap Capture to add your first expense</p>
+                    </div>
+                    <div class="expenses-list" id="expenses-list" style="display: none;">
+                        <!-- Expenses will be added here dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Capture Screen -->
+            <div class="screen" id="capture-screen">
+                <!-- Camera View -->
+                <div class="camera-container" id="camera-view">
+                    <div class="camera-placeholder">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                            <circle cx="12" cy="13" r="4"></circle>
+                        </svg>
+                        <p>Camera Preview</p>
+                    </div>
+                    <button class="snap-button" id="snap-button">
+                        <div class="snap-button-inner"></div>
+                    </button>
+                </div>
+
+                <!-- Voice Interface -->
+                <div class="voice-container" id="voice-view" style="display: none;">
+                    <div class="frozen-photo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                    </div>
+
+                    <div class="voice-interface">
+                        <div class="voice-prompt">
+                            <div class="microphone-icon" id="microphone-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                                    <line x1="12" y1="19" x2="12" y2="23"></line>
+                                    <line x1="8" y1="23" x2="16" y2="23"></line>
+                                </svg>
+                                <div class="listening-indicator"></div>
+                            </div>
+                            <p class="voice-instruction">Say one sentence, e.g., "Groceries 580 k Janaka Visa."</p>
+                            <p class="voice-transcript" id="voice-transcript"></p>
+                            <p class="voice-note">You can speak or tap to fill manually.</p>
+                        </div>
+
+                        <div class="voice-actions">
+                            <button class="skip-voice-button" id="skip-voice-button">Skip & Fill Manually</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview Card -->
+                <div class="preview-container" id="preview-view" style="display: none;">
+                    <div class="preview-header">
+                        <h2>Review Expense</h2>
+                        <button class="discard-button" id="discard-button">Discard</button>
+                    </div>
+
+                    <div class="preview-card">
+                        <div class="preview-thumbnail" id="preview-thumbnail">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                        </div>
+
+                        <div class="preview-form">
+                            <div class="form-group amount-group">
+                                <label>Amount</label>
+                                <div class="amount-input-wrapper">
+                                    <span class="currency-symbol">Rs</span>
+                                    <input type="number" id="expense-amount" placeholder="0.00" step="0.01" inputmode="decimal">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Category</label>
+                                <div class="chip-selector" id="category-chips">
+                                    <button class="chip active" data-category="1" data-icon="🍔" data-color="#FF3B30">
+                                        <span class="chip-icon">🍔</span>
+                                        <span class="chip-label">Food</span>
+                                    </button>
+                                    <button class="chip" data-category="2" data-icon="🚗" data-color="#007AFF">
+                                        <span class="chip-icon">🚗</span>
+                                        <span class="chip-label">Transport</span>
+                                    </button>
+                                    <button class="chip" data-category="3" data-icon="🛒" data-color="#34C759">
+                                        <span class="chip-icon">🛒</span>
+                                        <span class="chip-label">Groceries</span>
+                                    </button>
+                                    <button class="chip" data-category="4" data-icon="🏠" data-color="#FF9500">
+                                        <span class="chip-icon">🏠</span>
+                                        <span class="chip-label">Home</span>
+                                    </button>
+                                    <button class="chip" data-category="5" data-icon="⚡" data-color="#FFCC00">
+                                        <span class="chip-icon">⚡</span>
+                                        <span class="chip-label">Utilities</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Source</label>
+                                <div class="chip-selector" id="source-chips">
+                                    <button class="chip active" data-source="1" data-color="#007AFF">
+                                        <span class="chip-label">Chase Sapphire</span>
+                                    </button>
+                                    <button class="chip" data-source="2" data-color="#34C759">
+                                        <span class="chip-label">Cash</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Member</label>
+                                <div class="chip-selector" id="member-chips">
+                                    <button class="chip active" data-member="1" data-color="#007AFF">
+                                        <span class="chip-label">John Doe</span>
+                                    </button>
+                                    <button class="chip" data-member="2" data-color="#FF3B30">
+                                        <span class="chip-label">Jane Doe</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Date</label>
+                                <input type="date" id="expense-date" class="date-input">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="save-expense-button" id="save-expense-button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        <span>Save</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Wallets Screen -->
+            <div class="screen" id="wallets-screen">
+                <div class="screen-header">
+                    <h1>Wallets</h1>
+                </div>
+
+                <div class="wallets-list" id="wallets-list">
+                    <!-- Wallets will be populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Wallet Detail Screen -->
+            <div class="screen sub-screen" id="wallet-detail-screen">
+                <div class="screen-header">
+                    <button class="back-button" data-back="wallets-screen">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
+                    <h1 id="wallet-detail-name">Wallet</h1>
+                </div>
+
+                <!-- Wallet Summary Card -->
+                <div class="wallet-summary-card">
+                    <div class="wallet-summary-header">
+                        <div class="wallet-summary-info">
+                            <div class="wallet-summary-label">Available Balance</div>
+                            <div class="wallet-summary-balance" id="wallet-balance">Rs 0</div>
+                        </div>
+                        <div class="wallet-limit-info" id="wallet-limit-info" style="display: none;">
+                            <div class="wallet-limit-label">Limit</div>
+                            <div class="wallet-limit-amount" id="wallet-limit">Rs 0</div>
+                        </div>
+                    </div>
+
+                    <div class="wallet-progress-container" id="wallet-progress-container" style="display: none;">
+                        <div class="wallet-progress-bar">
+                            <div class="wallet-progress-fill" id="wallet-progress-fill"></div>
+                        </div>
+                        <div class="wallet-spent-info">
+                            <span>Spent: <strong id="wallet-spent">Rs 0</strong></span>
+                            <span>Remaining: <strong id="wallet-remaining">Rs 0</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Transactions -->
+                <div class="wallet-transactions-container">
+                    <h2 class="section-title">Recent Transactions</h2>
+                    <div class="wallet-transactions-list" id="wallet-transactions-list">
+                        <!-- Transactions will be populated dynamically -->
+                    </div>
+                    <div class="empty-state" id="wallet-empty-transactions" style="display: none;">
+                        <p>No transactions yet</p>
+                    </div>
+                </div>
+
+                <!-- Floating New Transfer Button -->
+                <button class="floating-action-button" id="new-transfer-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="17 1 21 5 17 9"></polyline>
+                        <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                        <polyline points="7 23 3 19 7 15"></polyline>
+                        <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- New Transfer Screen -->
+            <div class="screen sub-screen" id="transfer-screen">
+                <div class="screen-header">
+                    <button class="back-button" id="transfer-back-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
+                    <h1>New Transfer</h1>
+                </div>
+
+                <div class="form-container">
+                    <div class="form-group">
+                        <label for="transfer-from">From</label>
+                        <select id="transfer-from" class="transfer-select">
+                            <option value="">Select source</option>
+                        </select>
+                    </div>
+
+                    <div class="transfer-arrow-container">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <polyline points="19 12 12 19 5 12"></polyline>
+                        </svg>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="transfer-to">To</label>
+                        <select id="transfer-to" class="transfer-select">
+                            <option value="">Select destination</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group amount-group">
+                        <label>Amount</label>
+                        <div class="amount-input-wrapper">
+                            <span class="currency-symbol">Rs</span>
+                            <input type="number" id="transfer-amount" placeholder="0.00" step="0.01" inputmode="decimal">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="transfer-date" class="date-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="transfer-note">Note</label>
+                        <textarea id="transfer-note" placeholder="e.g., ATM withdrawal" rows="2"></textarea>
+                    </div>
+
+                    <button class="save-button" id="save-transfer-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        <span>Save Transfer</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Insights Screen -->
+            <div class="screen" id="insights-screen">
+                <div class="screen-header">
+                    <h1>Insights</h1>
+                </div>
+
+                <!-- Month Selector -->
+                <div class="month-selector">
+                    <button class="month-nav-btn" id="prev-month-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
+                    <div class="month-label" id="insights-month-label">November 2025</div>
+                    <button class="month-nav-btn" id="next-month-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="insights-summary-cards">
+                    <div class="insights-summary-card">
+                        <div class="insights-summary-label">Total Expenses</div>
+                        <div class="insights-summary-value" id="total-expenses-value">Rs 0</div>
+                    </div>
+                    <div class="insights-summary-card">
+                        <div class="insights-summary-label"># of Entries</div>
+                        <div class="insights-summary-value" id="entries-count-value">0</div>
+                    </div>
+                    <div class="insights-summary-card">
+                        <div class="insights-summary-label">Top Category</div>
+                        <div class="insights-summary-value" id="top-category-value">-</div>
+                    </div>
+                </div>
+
+                <!-- Category Pie Chart -->
+                <div class="chart-container">
+                    <h3 class="chart-title">Expenses by Category</h3>
+                    <div class="pie-chart-wrapper">
+                        <svg class="pie-chart" id="category-pie-chart" viewBox="0 0 200 200"></svg>
+                    </div>
+                    <div class="chart-legend" id="category-legend"></div>
+                </div>
+
+                <!-- Member Bar Chart -->
+                <div class="chart-container">
+                    <h3 class="chart-title">Expenses by Member</h3>
+                    <div class="bar-chart" id="member-bar-chart"></div>
+                </div>
+
+                <!-- Card Ring Charts -->
+                <div class="chart-container">
+                    <h3 class="chart-title">Card Usage</h3>
+                    <div class="ring-charts" id="card-ring-charts"></div>
+                </div>
+
+                <!-- Highlights -->
+                <div class="insights-highlights">
+                    <h3 class="chart-title">Highlights</h3>
+                    <div class="highlights-list" id="highlights-list"></div>
+                </div>
+
+                <!-- Empty State -->
+                <div class="empty-state" id="insights-empty-state" style="display: none;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 21H4.6c-.56 0-.84 0-1.054-.109a1 1 0 0 1-.437-.437C3 20.24 3 19.96 3 19.4V3m4 14l3.5-3.5 4 4L21 11"></path>
+                    </svg>
+                    <p>No data for this month</p>
+                    <p class="empty-hint">Add some expenses to see insights</p>
+                </div>
+            </div>
+
+            <!-- Settings Screen -->
+            <div class="screen" id="settings-screen">
+                <div class="screen-header">
+                    <h1>Settings</h1>
+                </div>
+                <div class="settings-list">
+                    <div class="settings-item" data-subscreen="profile-screen">
+                        <div class="settings-item-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </div>
+                        <span class="settings-item-label">Profile</span>
+                        <svg class="settings-item-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
+
+                    <div class="settings-item" data-subscreen="family-screen">
+                        <div class="settings-item-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                        </div>
+                        <span class="settings-item-label">Family Members</span>
+                        <svg class="settings-item-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
+
+                    <div class="settings-item" data-subscreen="cards-screen">
+                        <div class="settings-item-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                                <line x1="1" y1="10" x2="23" y2="10"></line>
+                            </svg>
+                        </div>
+                        <span class="settings-item-label">Cards & Wallets</span>
+                        <svg class="settings-item-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
+
+                    <div class="settings-item" data-subscreen="categories-screen">
+                        <div class="settings-item-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="3" width="7" height="7"></rect>
+                                <rect x="14" y="14" width="7" height="7"></rect>
+                                <rect x="3" y="14" width="7" height="7"></rect>
+                            </svg>
+                        </div>
+                        <span class="settings-item-label">Categories</span>
+                        <svg class="settings-item-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
+
+                    <div class="settings-item disabled">
+                        <div class="settings-item-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2v20M2 12h20"></path>
+                            </svg>
+                        </div>
+                        <span class="settings-item-label">Budgets</span>
+                        <span class="settings-badge">Coming Soon</span>
+                    </div>
+
+                    <div class="settings-item disabled">
+                        <div class="settings-item-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                            </svg>
+                        </div>
+                        <span class="settings-item-label">Data</span>
+                        <span class="settings-badge">Coming Soon</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Sub-Screen -->
+            <div class="screen sub-screen" id="profile-screen">
+                <div class="screen-header">
+                    <button class="back-button" data-back="settings-screen">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
+                    <h1>Profile</h1>
+                </div>
+                <div class="form-container">
+                    <div class="form-group">
+                        <label for="profile-name">Name</label>
+                        <input type="text" id="profile-name" placeholder="Enter your name" value="John Doe">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="profile-language">Language</label>
+                        <select id="profile-language">
+                            <option value="en">English</option>
+                            <option value="es">Spanish</option>
+                            <option value="fr">French</option>
+                            <option value="de">German</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="profile-currency">Currency</label>
+                        <select id="profile-currency">
+                            <option value="LKR">LKR - Sri Lankan Rupee</option>
+                            <option value="USD">USD - US Dollar</option>
+                            <option value="EUR">EUR - Euro</option>
+                            <option value="GBP">GBP - British Pound</option>
+                            <option value="JPY">JPY - Japanese Yen</option>
+                            <option value="INR">INR - Indian Rupee</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="profile-monthstart">Month Start Day</label>
+                        <select id="profile-monthstart">
+                            <option value="1">1st of the month</option>
+                            <option value="15">15th of the month</option>
+                            <option value="25">25th of the month</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group toggle-group">
+                        <div class="toggle-label-container">
+                            <label for="profile-applock">App Lock</label>
+                            <span class="toggle-description">Require PIN to open app</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="profile-applock">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Family Members Sub-Screen -->
+            <div class="screen sub-screen" id="family-screen">
+                <div class="screen-header">
+                    <button class="back-button" data-back="settings-screen">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
+                    <h1>Family Members</h1>
+                </div>
+                <div class="list-container">
+                    <div class="member-item" data-member-id="1">
+                        <div class="member-avatar" style="background-color: #007AFF;">
+                            <span>JD</span>
+                        </div>
+                        <div class="member-info">
+                            <div class="member-name">John Doe</div>
+                            <div class="member-role">Owner</div>
+                        </div>
+                        <div class="member-color-tag" style="background-color: #007AFF;"></div>
+                    </div>
+
+                    <div class="member-item" data-member-id="2">
+                        <div class="member-avatar" style="background-color: #FF3B30;">
+                            <span>JD</span>
+                        </div>
+                        <div class="member-info">
+                            <div class="member-name">Jane Doe</div>
+                            <div class="member-role">Member</div>
+                        </div>
+                        <div class="member-color-tag" style="background-color: #FF3B30;"></div>
+                    </div>
+                </div>
+                <button class="add-button" id="add-member-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="16"></line>
+                        <line x1="8" y1="12" x2="16" y2="12"></line>
+                    </svg>
+                    <span>Add Member</span>
+                </button>
+            </div>
+
+            <!-- Family Member Edit Sub-Screen -->
+            <div class="screen sub-screen" id="member-edit-screen">
+                <div class="screen-header">
+                    <button class="back-button" data-back="family-screen">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
+                    <h1 id="member-edit-title">Edit Member</h1>
+                </div>
+                <div class="form-container">
+                    <div class="avatar-selector">
+                        <div class="avatar-preview" id="member-avatar-preview" style="background-color: #007AFF;">
+                            <span id="member-avatar-initials">JD</span>
+                        </div>
+                        <button class="avatar-change-btn">Change Avatar</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="member-name">Name</label>
+                        <input type="text" id="member-name" placeholder="Enter member name">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Color Tag</label>
+                        <div class="color-picker">
+                            <button class="color-option active" data-color="#6B8E7F" style="background-color: #6B8E7F;"></button>
+                            <button class="color-option" data-color="#A67B5B" style="background-color: #A67B5B;"></button>
+                            <button class="color-option" data-color="#8B7355" style="background-color: #8B7355;"></button>
+                            <button class="color-option" data-color="#9B6B5C" style="background-color: #9B6B5C;"></button>
+                            <button class="color-option" data-color="#7D8A5A" style="background-color: #7D8A5A;"></button>
+                            <button class="color-option" data-color="#5B7553" style="background-color: #5B7553;"></button>
+                            <button class="color-option" data-color="#8A7B6B" style="background-color: #8A7B6B;"></button>
+                            <button class="color-option" data-color="#7A8E77" style="background-color: #7A8E77;"></button>
+                        </div>
+                    </div>
+
+                    <button class="save-button" id="save-member-btn">Save Member</button>
+                    <button class="delete-button" id="delete-member-btn" style="display: none;">Delete Member</button>
+                </div>
+            </div>
+
+            <!-- Cards & Wallets Sub-Screen -->
+            <div class="screen sub-screen" id="cards-screen">
+                <div class="screen-header">
+                    <button class="back-button" data-back="settings-screen">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
+                    <h1>Cards & Wallets</h1>
+                </div>
+                <div class="list-container">
+                    <div class="card-item" data-card-id="1">
+                        <div class="card-icon" style="background-color: #007AFF;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                                <line x1="1" y1="10" x2="23" y2="10"></line>
+                            </svg>
+                        </div>
+                        <div class="card-info">
+                            <div class="card-name">Chase Sapphire</div>
+                            <div class="card-details">Credit • John Doe • Rs 5,000</div>
+                        </div>
+                        <label class="toggle-switch small">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="card-item" data-card-id="2">
+                        <div class="card-icon" style="background-color: #34C759;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"></path>
+                                <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path>
+                                <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"></path>
+                            </svg>
+                        </div>
+                        <div class="card-info">
+                            <div class="card-name">Cash Wallet</div>
+                            <div class="card-details">Cash • John Doe</div>
+                        </div>
+                        <label class="toggle-switch small">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <button class="add-button" id="add-card-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="16"></line>
+                        <line x1="8" y1="12" x2="16" y2="12"></line>
+                    </svg>
+                    <span>Add Card / Wallet</span>
+                </button>
+            </div>
+
+            <!-- Card/Wallet Edit Sub-Screen -->
+            <div class="screen sub-screen" id="card-edit-screen">
+                <div class="screen-header">
+                    <button class="back-button" data-back="cards-screen">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
+                    <h1 id="card-edit-title">Add Card / Wallet</h1>
+                </div>
+                <div class="form-container">
+                    <div class="form-group">
+                        <label for="card-name">Name</label>
+                        <input type="text" id="card-name" placeholder="e.g., Chase Sapphire">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="card-type">Type</label>
+                        <select id="card-type">
+                            <option value="credit">Credit Card</option>
+                            <option value="debit">Debit Card</option>
+                            <option value="cash">Cash</option>
+                            <option value="bank">Bank Account</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="card-owner">Owner</label>
+                        <select id="card-owner">
+                            <option value="1">John Doe</option>
+                            <option value="2">Jane Doe</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="card-limit">Credit Limit (Optional)</label>
+                        <input type="number" id="card-limit" placeholder="e.g., 5000">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="card-billing">Billing Day (Optional)</label>
+                        <select id="card-billing">
+                            <option value="">None</option>
+                            <option value="1">1st</option>
+                            <option value="5">5th</option>
+                            <option value="10">10th</option>
+                            <option value="15">15th</option>
+                            <option value="20">20th</option>
+                            <option value="25">25th</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Color Tag</label>
+                        <div class="color-picker">
+                            <button class="color-option active" data-color="#6B8E7F" style="background-color: #6B8E7F;"></button>
+                            <button class="color-option" data-color="#A67B5B" style="background-color: #A67B5B;"></button>
+                            <button class="color-option" data-color="#8B7355" style="background-color: #8B7355;"></button>
+                            <button class="color-option" data-color="#9B6B5C" style="background-color: #9B6B5C;"></button>
+                            <button class="color-option" data-color="#7D8A5A" style="background-color: #7D8A5A;"></button>
+                            <button class="color-option" data-color="#5B7553" style="background-color: #5B7553;"></button>
+                            <button class="color-option" data-color="#8A7B6B" style="background-color: #8A7B6B;"></button>
+                            <button class="color-option" data-color="#7A8E77" style="background-color: #7A8E77;"></button>
+                        </div>
+                    </div>
+
+                    <div class="form-group toggle-group">
+                        <div class="toggle-label-container">
+                            <label for="card-active">Active</label>
+                            <span class="toggle-description">Include in expense tracking</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="card-active" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <button class="save-button" id="save-card-btn">Save Card</button>
+                    <button class="delete-button" id="delete-card-btn" style="display: none;">Delete Card</button>
+                </div>
+            </div>
+
+            <!-- Categories Sub-Screen -->
+            <div class="screen sub-screen" id="categories-screen">
+                <div class="screen-header">
+                    <button class="back-button" data-back="settings-screen">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
+                    <h1>Categories</h1>
+                </div>
+                <div class="list-container">
+                    <div class="category-item" data-category-id="1">
+                        <div class="category-icon" style="background-color: #FF3B30;">
+                            <span>🍔</span>
+                        </div>
+                        <div class="category-info">
+                            <div class="category-name">Food & Dining</div>
+                            <div class="category-details">Chase Sapphire</div>
+                        </div>
+                    </div>
+
+                    <div class="category-item" data-category-id="2">
+                        <div class="category-icon" style="background-color: #007AFF;">
+                            <span>🚗</span>
+                        </div>
+                        <div class="category-info">
+                            <div class="category-name">Transportation</div>
+                            <div class="category-details">Cash Wallet</div>
+                        </div>
+                    </div>
+
+                    <div class="category-item" data-category-id="3">
+                        <div class="category-icon" style="background-color: #34C759;">
+                            <span>🛒</span>
+                        </div>
+                        <div class="category-info">
+                            <div class="category-name">Groceries</div>
+                            <div class="category-details">No default wallet</div>
+                        </div>
+                    </div>
+                </div>
+                <button class="add-button" id="add-category-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="16"></line>
+                        <line x1="8" y1="12" x2="16" y2="12"></line>
+                    </svg>
+                    <span>Add Category</span>
+                </button>
+            </div>
+
+            <!-- Category Edit Sub-Screen -->
+            <div class="screen sub-screen" id="category-edit-screen">
+                <div class="screen-header">
+                    <button class="back-button" data-back="categories-screen">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
+                    <h1 id="category-edit-title">Add Category</h1>
+                </div>
+                <div class="form-container">
+                    <div class="form-group">
+                        <label for="category-name">Name</label>
+                        <input type="text" id="category-name" placeholder="e.g., Food & Dining">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Icon</label>
+                        <div class="icon-picker">
+                            <button class="icon-option active" data-icon="🍔">🍔</button>
+                            <button class="icon-option" data-icon="🚗">🚗</button>
+                            <button class="icon-option" data-icon="🛒">🛒</button>
+                            <button class="icon-option" data-icon="🏠">🏠</button>
+                            <button class="icon-option" data-icon="⚡">⚡</button>
+                            <button class="icon-option" data-icon="🎬">🎬</button>
+                            <button class="icon-option" data-icon="💊">💊</button>
+                            <button class="icon-option" data-icon="✈️">✈️</button>
+                            <button class="icon-option" data-icon="🎓">🎓</button>
+                            <button class="icon-option" data-icon="👕">👕</button>
+                            <button class="icon-option" data-icon="📱">📱</button>
+                            <button class="icon-option" data-icon="💰">💰</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Color</label>
+                        <div class="color-picker">
+                            <button class="color-option active" data-color="#8B7355" style="background-color: #8B7355;"></button>
+                            <button class="color-option" data-color="#6B8E7F" style="background-color: #6B8E7F;"></button>
+                            <button class="color-option" data-color="#A67B5B" style="background-color: #A67B5B;"></button>
+                            <button class="color-option" data-color="#7D8A5A" style="background-color: #7D8A5A;"></button>
+                            <button class="color-option" data-color="#9B6B5C" style="background-color: #9B6B5C;"></button>
+                            <button class="color-option" data-color="#5B7553" style="background-color: #5B7553;"></button>
+                            <button class="color-option" data-color="#8A7B6B" style="background-color: #8A7B6B;"></button>
+                            <button class="color-option" data-color="#7A8E77" style="background-color: #7A8E77;"></button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category-wallet">Default Wallet/Card (Optional)</label>
+                        <select id="category-wallet">
+                            <option value="">None</option>
+                            <option value="1">Chase Sapphire</option>
+                            <option value="2">Cash Wallet</option>
+                        </select>
+                    </div>
+
+                    <button class="save-button" id="save-category-btn">Save Category</button>
+                    <button class="delete-button" id="delete-category-btn" style="display: none;">Delete Category</button>
+                </div>
+            </div>
+
+            <!-- Edit Entry Screen -->
+            <div class="screen sub-screen" id="edit-entry-screen">
+                <div class="screen-header">
+                    <button class="back-button" data-back="home-screen">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
+                    <h1>Edit Entry</h1>
+                </div>
+
+                <div class="form-container">
+                    <!-- Photo Thumbnail -->
+                    <div class="edit-thumbnail">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                    </div>
+
+                    <!-- Amount -->
+                    <div class="form-group amount-group">
+                        <label>Amount</label>
+                        <div class="amount-input-wrapper">
+                            <span class="currency-symbol">Rs</span>
+                            <input type="number" id="edit-amount" placeholder="0.00" step="0.01" inputmode="decimal">
+                        </div>
+                    </div>
+
+                    <!-- Category -->
+                    <div class="form-group">
+                        <label>Category</label>
+                        <div class="chip-selector" id="edit-category-chips">
+                            <button class="chip" data-category="1" data-icon="🍔" data-color="#FF3B30">
+                                <span class="chip-icon">🍔</span>
+                                <span class="chip-label">Food</span>
+                            </button>
+                            <button class="chip" data-category="2" data-icon="🚗" data-color="#007AFF">
+                                <span class="chip-icon">🚗</span>
+                                <span class="chip-label">Transport</span>
+                            </button>
+                            <button class="chip" data-category="3" data-icon="🛒" data-color="#34C759">
+                                <span class="chip-icon">🛒</span>
+                                <span class="chip-label">Groceries</span>
+                            </button>
+                            <button class="chip" data-category="4" data-icon="🏠" data-color="#FF9500">
+                                <span class="chip-icon">🏠</span>
+                                <span class="chip-label">Home</span>
+                            </button>
+                            <button class="chip" data-category="5" data-icon="⚡" data-color="#FFCC00">
+                                <span class="chip-icon">⚡</span>
+                                <span class="chip-label">Utilities</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Source -->
+                    <div class="form-group">
+                        <label>Source</label>
+                        <div class="chip-selector" id="edit-source-chips">
+                            <button class="chip" data-source="1" data-color="#007AFF">
+                                <span class="chip-label">Chase Sapphire</span>
+                            </button>
+                            <button class="chip" data-source="2" data-color="#34C759">
+                                <span class="chip-label">Cash</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Member -->
+                    <div class="form-group">
+                        <label>Member</label>
+                        <div class="chip-selector" id="edit-member-chips">
+                            <button class="chip" data-member="1" data-color="#007AFF">
+                                <span class="chip-label">John Doe</span>
+                            </button>
+                            <button class="chip" data-member="2" data-color="#FF3B30">
+                                <span class="chip-label">Jane Doe</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Date -->
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="edit-date" class="date-input">
+                    </div>
+
+                    <!-- Note -->
+                    <div class="form-group">
+                        <label for="edit-note">Note (Optional)</label>
+                        <textarea id="edit-note" placeholder="Add a note..." rows="2"></textarea>
+                    </div>
+
+                    <!-- Save Button -->
+                    <button class="save-button" id="save-edit-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        <span>Save</span>
+                    </button>
+
+                    <!-- Delete Button -->
+                    <button class="delete-button" id="delete-entry-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                        </svg>
+                        <span>Delete Entry</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search Screen -->
+            <div class="screen sub-screen" id="search-screen">
+                <div class="screen-header">
+                    <button class="back-button" data-back="home-screen">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
+                    <h1>Search</h1>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="search-bar-container">
+                    <div class="search-input-wrapper">
+                        <svg class="search-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                        <input type="text" id="search-input" class="search-input" placeholder="Search by store, amount, tag...">
+                        <button class="search-clear-btn" id="search-clear-btn" style="display: none;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filter Chips -->
+                <div class="search-filters-container">
+                    <div class="search-filter-group">
+                        <div class="search-filter-label">Type</div>
+                        <div class="search-filter-chips">
+                            <button class="filter-chip active" data-filter="type" data-value="all">All</button>
+                            <button class="filter-chip" data-filter="type" data-value="expense">Expense</button>
+                            <button class="filter-chip" data-filter="type" data-value="transfer">Transfer</button>
+                        </div>
+                    </div>
+
+                    <div class="search-filter-group">
+                        <div class="search-filter-label">Member</div>
+                        <div class="search-filter-chips">
+                            <button class="filter-chip active" data-filter="member" data-value="all">All</button>
+                            <button class="filter-chip" data-filter="member" data-value="1">John Doe</button>
+                            <button class="filter-chip" data-filter="member" data-value="2">Jane Doe</button>
+                        </div>
+                    </div>
+
+                    <div class="search-filter-group">
+                        <div class="search-filter-label">Source</div>
+                        <div class="search-filter-chips">
+                            <button class="filter-chip active" data-filter="source" data-value="all">All</button>
+                            <button class="filter-chip" data-filter="source" data-value="1">Chase Sapphire</button>
+                            <button class="filter-chip" data-filter="source" data-value="2">Cash</button>
+                        </div>
+                    </div>
+
+                    <div class="search-filter-group">
+                        <div class="search-filter-label">Category</div>
+                        <div class="search-filter-chips">
+                            <button class="filter-chip active" data-filter="category" data-value="all">All</button>
+                            <button class="filter-chip" data-filter="category" data-value="1">🍔 Food</button>
+                            <button class="filter-chip" data-filter="category" data-value="2">🚗 Transport</button>
+                            <button class="filter-chip" data-filter="category" data-value="3">🛒 Groceries</button>
+                            <button class="filter-chip" data-filter="category" data-value="4">🏠 Home</button>
+                            <button class="filter-chip" data-filter="category" data-value="5">⚡ Utilities</button>
+                        </div>
+                    </div>
+
+                    <button class="clear-filters-btn" id="clear-filters-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="1 4 1 10 7 10"></polyline>
+                            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                        </svg>
+                        <span>Clear All Filters</span>
+                    </button>
+                </div>
+
+                <!-- Search Results -->
+                <div class="search-results-container">
+                    <div class="search-results-header">
+                        <h2 class="section-title">Results</h2>
+                        <span class="search-results-count" id="search-results-count">0 items</span>
+                    </div>
+
+                    <div class="search-results-list" id="search-results-list">
+                        <!-- Results will be populated dynamically -->
+                    </div>
+
+                    <div class="empty-state" id="search-empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                        <p>No results found</p>
+                        <p class="empty-hint">Try adjusting your search or filters</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bottom Navigation Bar -->
+        <nav class="bottom-nav">
+            <button class="nav-item" data-screen="home-screen">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span class="nav-label">Home</span>
+            </button>
+
+            <button class="nav-item" data-screen="wallets-screen">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                    <path d="M7 15h.01M11 15h2"></path>
+                </svg>
+                <span class="nav-label">Wallets</span>
+            </button>
+
+            <button class="nav-item nav-item-capture active" data-screen="capture-screen">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="16"></line>
+                    <line x1="8" y1="12" x2="16" y2="12"></line>
+                </svg>
+                <span class="nav-label">Capture</span>
+            </button>
+
+            <button class="nav-item" data-screen="insights-screen">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 21H4.6c-.56 0-.84 0-1.054-.109a1 1 0 0 1-.437-.437C3 20.24 3 19.96 3 19.4V3m4 14l3.5-3.5 4 4L21 11"></path>
+                </svg>
+                <span class="nav-label">Insights</span>
+            </button>
+
+            <button class="nav-item" data-screen="settings-screen">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+                </svg>
+                <span class="nav-label">Settings</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">Saved</div>
+
+    <script src="script.js"></script>
+</body>
+</html>
