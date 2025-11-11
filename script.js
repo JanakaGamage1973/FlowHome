@@ -343,13 +343,25 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Initialize camera when navigating to capture screen
-    const captureNavItem = document.querySelector('[data-screen="capture-screen"]');
-    if (captureNavItem) {
-        captureNavItem.addEventListener('click', function() {
-            setTimeout(() => {
-                initializeCamera();
-            }, 100);
+    navItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const screenId = this.getAttribute('data-screen');
+            if (screenId === 'capture-screen') {
+                setTimeout(() => {
+                    initializeCamera();
+                }, 200);
+            } else {
+                // Stop camera when leaving capture screen
+                stopCamera();
+            }
         });
+    });
+
+    // Initialize camera on page load if capture screen is active
+    if (document.getElementById('capture-screen').classList.contains('active')) {
+        setTimeout(() => {
+            initializeCamera();
+        }, 500);
     }
 
     // Snap button - capture photo and switch to voice interface
@@ -753,24 +765,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         lastSavedExpense = null;
         showToast('Undone');
-    }
-
-    // Reset camera view when switching to Capture screen
-    const captureNavItem = document.querySelector('[data-screen="capture-screen"]');
-    if (captureNavItem) {
-        captureNavItem.addEventListener('click', function() {
-            // Reset to camera view
-            voiceView.style.display = 'none';
-            previewView.style.display = 'none';
-            cameraView.style.display = 'flex';
-
-            // Clear transcript
-            document.getElementById('voice-transcript').textContent = '';
-
-            // Stop any animations
-            const micIcon = document.getElementById('microphone-icon');
-            micIcon.classList.remove('listening');
-        });
     }
 
     // ==================== EDIT ENTRY SCREEN ====================
