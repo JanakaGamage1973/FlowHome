@@ -28,9 +28,16 @@ document.addEventListener('DOMContentLoaded', function() {
             activeNavItem.classList.add('active');
         }
 
-        // Reset capture screen when navigating to it
+        // Reset capture screen when navigating to it and auto-open camera
         if (targetScreenId === 'capture-screen') {
             resetCaptureScreen();
+            // Auto-trigger camera/photo picker when capture screen opens
+            setTimeout(() => {
+                const photoInput = document.getElementById('photo-input');
+                if (photoInput) {
+                    photoInput.click();
+                }
+            }, 100); // Small delay to ensure screen transition completes
         }
 
         // Scroll to top of content area
