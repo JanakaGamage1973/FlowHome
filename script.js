@@ -959,42 +959,42 @@ document.addEventListener('DOMContentLoaded', function() {
         {
             id: '1',
             name: 'Food & Dining',
-            icon: 'restaurant',
+            icon: '🍽️',
             color: '#8B7355',
             defaultWallet: '1'
         },
         {
             id: '2',
             name: 'Transportation',
-            icon: 'car',
+            icon: '🚗',
             color: '#6B8E7F',
             defaultWallet: '1'
         },
         {
             id: '3',
             name: 'Shopping',
-            icon: 'cart',
+            icon: '🛒',
             color: '#A67B5B',
             defaultWallet: '1'
         },
         {
             id: '4',
             name: 'Entertainment',
-            icon: 'game',
+            icon: '🎮',
             color: '#7D8A5A',
             defaultWallet: '2'
         },
         {
             id: '5',
             name: 'Healthcare',
-            icon: 'medical',
+            icon: '💊',
             color: '#9B6B5C',
             defaultWallet: '1'
         },
         {
             id: '6',
             name: 'Bills & Utilities',
-            icon: 'file',
+            icon: '📄',
             color: '#5B7553',
             defaultWallet: '1'
         }
