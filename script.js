@@ -917,8 +917,8 @@ document.addEventListener('DOMContentLoaded', function() {
         let monthTotal = 0;
 
         allExpenses.forEach(expense => {
-            // Skip transfers - they don't count as expenses
-            if (expense.isTransfer) return;
+            // Skip transfers and deposits - they don't count as expenses
+            if (expense.isTransfer || expense.isDeposit) return;
 
             const expenseDate = new Date(expense.date);
             expenseDate.setHours(0, 0, 0, 0);
@@ -1202,7 +1202,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Get all expenses for this wallet
         allExpenses.forEach(expense => {
-            if (expense.source.id === walletId && !expense.isTransfer) {
+            if (expense.source.id === walletId && !expense.isTransfer && !expense.isDeposit) {
                 spent += expense.amount;
                 balance -= expense.amount;
             }
@@ -1217,6 +1217,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (expense.transferTo === walletId) {
                     balance += expense.amount;
                 }
+            }
+        });
+
+        // Add deposits
+        allExpenses.forEach(expense => {
+            if (expense.isDeposit && expense.depositTo === walletId) {
+                balance += expense.amount;
             }
         });
 
@@ -1255,6 +1262,17 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('wallet-progress-container').style.display = 'none';
         }
 
+        // Show/hide Add Money button based on wallet type
+        const addMoneyBtn = document.getElementById('add-money-btn');
+        if (addMoneyBtn) {
+            // Show for Account types (savings, checking) and Cash
+            if (wallet.walletSubtype === 'savings' || wallet.walletSubtype === 'cash') {
+                addMoneyBtn.style.display = 'flex';
+            } else {
+                addMoneyBtn.style.display = 'none';
+            }
+        }
+
         // Load transactions
         loadWalletTransactions(walletId);
 
@@ -1273,6 +1291,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const walletTransactions = allExpenses.filter(expense => {
             if (expense.isTransfer) {
                 return expense.transferFrom === walletId || expense.transferTo === walletId;
+            }
+            if (expense.isDeposit) {
+                return expense.depositTo === walletId;
             }
             return expense.source.id === walletId;
         });
@@ -1295,7 +1316,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 day: 'numeric'
             });
 
-            let amount, amountClass, icon, name;
+            let amount, amountClass, icon, name, badge;
 
             if (transaction.isTransfer) {
                 const isIncoming = transaction.transferTo === walletId;
@@ -1303,21 +1324,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 amountClass = isIncoming ? 'positive' : 'negative';
                 icon = '🔄';
                 name = transaction.note || 'Transfer';
+                badge = '<span class="transfer-badge">Transfer</span>';
+            } else if (transaction.isDeposit) {
+                amount = `+${getCurrencySymbol()} ${formatCurrency(transaction.amount)}`;
+                amountClass = 'positive';
+                icon = transaction.category.icon;
+                name = transaction.note || 'Deposit';
+                badge = '<span class="deposit-badge">Deposit</span>';
             } else {
                 amount = `-${getCurrencySymbol()} ${formatCurrency(transaction.amount)}`;
                 amountClass = 'negative';
                 icon = transaction.category.icon;
                 name = transaction.category.name;
+                badge = '';
             }
 
+            const bgColor = transaction.isTransfer ? '#007AFF' : (transaction.isDeposit ? '#4A9C4A' : transaction.category.color);
+
             item.innerHTML = `
-                <div class="wallet-transaction-icon" style="background-color: ${transaction.isTransfer ? '#007AFF' : transaction.category.color};">
+                <div class="wallet-transaction-icon" style="background-color: ${bgColor};">
                     ${icon}
                 </div>
                 <div class="wallet-transaction-details">
                     <div class="wallet-transaction-name">
                         ${name}
-                        ${transaction.isTransfer ? '<span class="transfer-badge">Transfer</span>' : ''}
+                        ${badge}
                     </div>
                     <div class="wallet-transaction-date">${formattedDate}</div>
                 </div>
@@ -1413,6 +1444,94 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Show success message
             showToast('Transfer saved');
+
+            // Refresh wallets list
+            refreshWalletsList();
+
+            // Return to wallet detail
+            setTimeout(() => {
+                openWalletDetail(currentWalletId);
+            }, 500);
+        });
+    }
+
+    // Add Money button
+    const addMoneyBtn = document.getElementById('add-money-btn');
+    if (addMoneyBtn) {
+        addMoneyBtn.addEventListener('click', () => {
+            openDepositScreen();
+        });
+    }
+
+    // Open deposit screen
+    function openDepositScreen() {
+        const depositToSelect = document.getElementById('deposit-to');
+        const wallet = allWallets.find(w => w.id === currentWalletId);
+
+        if (!wallet) return;
+
+        // Set current wallet as the deposit destination
+        depositToSelect.innerHTML = `<option value="${wallet.id}">${wallet.name}</option>`;
+        depositToSelect.value = wallet.id;
+
+        // Set today's date
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('deposit-date').value = today;
+
+        // Clear form
+        document.getElementById('deposit-amount').value = '';
+        document.getElementById('deposit-note').value = '';
+
+        switchScreen('deposit-screen');
+    }
+
+    // Deposit back button
+    const depositBackBtn = document.getElementById('deposit-back-btn');
+    if (depositBackBtn) {
+        depositBackBtn.addEventListener('click', () => {
+            switchScreen('wallet-detail-screen');
+        });
+    }
+
+    // Save deposit
+    const saveDepositBtn = document.getElementById('save-deposit-btn');
+    if (saveDepositBtn) {
+        saveDepositBtn.addEventListener('click', () => {
+            const walletId = document.getElementById('deposit-to').value;
+            const amount = parseFloat(document.getElementById('deposit-amount').value);
+            const date = document.getElementById('deposit-date').value;
+            const note = document.getElementById('deposit-note').value;
+
+            if (!walletId) {
+                showToast('Please select a wallet');
+                return;
+            }
+
+            if (!amount || amount <= 0) {
+                showToast('Please enter a valid amount');
+                return;
+            }
+
+            const wallet = allWallets.find(w => w.id === walletId);
+
+            // Create deposit record
+            const deposit = {
+                id: Date.now(),
+                amount: amount,
+                date: date,
+                note: note || 'Deposit',
+                isDeposit: true,
+                depositTo: walletId,
+                category: { id: 'deposit', name: 'Deposit', icon: '💰', color: '#4A9C4A' },
+                source: { id: walletId, name: wallet.name, color: wallet.color },
+                member: { id: '1', name: 'John Doe' }
+            };
+
+            // Add to expenses array
+            allExpenses.unshift(deposit);
+
+            // Show success message
+            showToast('Deposit saved');
 
             // Refresh wallets list
             refreshWalletsList();

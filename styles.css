@@ -1865,6 +1865,18 @@ textarea::placeholder {
     vertical-align: middle;
 }
 
+.deposit-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    color: #4A9C4A;
+    background-color: rgba(74, 156, 74, 0.15);
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
 /* Floating Action Button */
 .floating-action-button {
     position: fixed;
@@ -1895,6 +1907,37 @@ textarea::placeholder {
     width: 28px;
     height: 28px;
     stroke: #ffffff;
+}
+
+/* Floating Action Button Container */
+.fab-container {
+    position: fixed;
+    bottom: 100px;
+    right: 20px;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 12px;
+    align-items: flex-end;
+}
+
+.fab-container .floating-action-button {
+    position: static;
+}
+
+.secondary-fab {
+    width: 52px !important;
+    height: 52px !important;
+    background-color: var(--md-primary) !important;
+    box-shadow: 0 3px 10px rgba(107, 155, 142, 0.4) !important;
+}
+
+.secondary-fab:active {
+    box-shadow: 0 2px 6px rgba(107, 155, 142, 0.3) !important;
+}
+
+.secondary-fab svg {
+    width: 24px !important;
+    height: 24px !important;
 }
 
 /* Transfer Screen */
