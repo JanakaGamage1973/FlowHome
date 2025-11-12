@@ -146,8 +146,13 @@ body {
 
 /* Screen Header */
 .screen-header {
+    position: sticky;
+    top: 0;
     padding: var(--spacing-sm) 0 var(--spacing-xl) 0;
     margin-bottom: var(--spacing-xl);
+    background-color: var(--md-background);
+    z-index: 10;
+    transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .screen-header h1 {
