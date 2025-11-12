@@ -100,7 +100,7 @@
                                 <label>Amount</label>
                                 <div class="amount-input-wrapper">
                                     <span class="currency-symbol">Rs</span>
-                                    <input type="number" id="expense-amount" placeholder="0.00" step="0.01" inputmode="decimal">
+                                    <input type="number" id="expense-amount" placeholder="0.00" step="0.01" inputmode="decimal" autocomplete="off">
                                 </div>
                             </div>
 
@@ -156,7 +156,7 @@
 
                             <div class="form-group">
                                 <label>Date</label>
-                                <input type="date" id="expense-date" class="date-input">
+                                <input type="date" id="expense-date" class="date-input" autocomplete="off">
                             </div>
                         </div>
                     </div>
@@ -263,7 +263,7 @@
                 <div class="form-container">
                     <div class="form-group">
                         <label for="transfer-from">From</label>
-                        <select id="transfer-from" class="transfer-select">
+                        <select id="transfer-from" class="transfer-select" autocomplete="off">
                             <option value="">Select source</option>
                         </select>
                     </div>
@@ -277,7 +277,7 @@
 
                     <div class="form-group">
                         <label for="transfer-to">To</label>
-                        <select id="transfer-to" class="transfer-select">
+                        <select id="transfer-to" class="transfer-select" autocomplete="off">
                             <option value="">Select destination</option>
                         </select>
                     </div>
@@ -286,18 +286,18 @@
                         <label>Amount</label>
                         <div class="amount-input-wrapper">
                             <span class="currency-symbol">Rs</span>
-                            <input type="number" id="transfer-amount" placeholder="0.00" step="0.01" inputmode="decimal">
+                            <input type="number" id="transfer-amount" placeholder="0.00" step="0.01" inputmode="decimal" autocomplete="off">
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label>Date</label>
-                        <input type="date" id="transfer-date" class="date-input">
+                        <input type="date" id="transfer-date" class="date-input" autocomplete="off">
                     </div>
 
                     <div class="form-group">
                         <label for="transfer-note">Note</label>
-                        <textarea id="transfer-note" placeholder="e.g., ATM withdrawal" rows="2"></textarea>
+                        <textarea id="transfer-note" placeholder="e.g., ATM withdrawal" rows="2" autocomplete="off"></textarea>
                     </div>
 
                     <button class="save-button" id="save-transfer-btn">
@@ -323,7 +323,7 @@
                 <div class="form-container">
                     <div class="form-group">
                         <label for="deposit-to">To Wallet</label>
-                        <select id="deposit-to" class="transfer-select" disabled>
+                        <select id="deposit-to" class="transfer-select" disabled autocomplete="off">
                             <option value="">Select wallet</option>
                         </select>
                     </div>
@@ -332,18 +332,18 @@
                         <label>Amount</label>
                         <div class="amount-input-wrapper">
                             <span class="currency-symbol">Rs</span>
-                            <input type="number" id="deposit-amount" placeholder="0.00" step="0.01" inputmode="decimal">
+                            <input type="number" id="deposit-amount" placeholder="0.00" step="0.01" inputmode="decimal" autocomplete="off">
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label>Date</label>
-                        <input type="date" id="deposit-date" class="date-input">
+                        <input type="date" id="deposit-date" class="date-input" autocomplete="off">
                     </div>
 
                     <div class="form-group">
                         <label for="deposit-note">Note</label>
-                        <textarea id="deposit-note" placeholder="e.g., Salary, Gift, Income" rows="2"></textarea>
+                        <textarea id="deposit-note" placeholder="e.g., Salary, Gift, Income" rows="2" autocomplete="off"></textarea>
                     </div>
 
                     <button class="save-button" id="save-deposit-btn">
@@ -555,12 +555,12 @@
                 <div class="form-container">
                     <div class="form-group">
                         <label for="profile-name">Name</label>
-                        <input type="text" id="profile-name" placeholder="Enter your name" value="John Doe">
+                        <input type="text" id="profile-name" placeholder="Enter your name" value="John Doe" autocomplete="off">
                     </div>
 
                     <div class="form-group">
                         <label for="profile-language">Language</label>
-                        <select id="profile-language">
+                        <select id="profile-language" autocomplete="off">
                             <option value="en">English</option>
                             <option value="es">Spanish</option>
                             <option value="fr">French</option>
@@ -570,7 +570,7 @@
 
                     <div class="form-group">
                         <label for="profile-currency">Currency</label>
-                        <select id="profile-currency">
+                        <select id="profile-currency" autocomplete="off">
                             <option value="LKR">LKR - Sri Lankan Rupee</option>
                             <option value="USD">USD - US Dollar</option>
                             <option value="EUR">EUR - Euro</option>
@@ -582,7 +582,7 @@
 
                     <div class="form-group">
                         <label for="profile-monthstart">Month Start Day</label>
-                        <select id="profile-monthstart">
+                        <select id="profile-monthstart" autocomplete="off">
                             <option value="1">1st of the month</option>
                             <option value="15">15th of the month</option>
                             <option value="25">25th of the month</option>
@@ -665,7 +665,7 @@
 
                     <div class="form-group">
                         <label for="member-name">Name</label>
-                        <input type="text" id="member-name" placeholder="Enter member name">
+                        <input type="text" id="member-name" placeholder="Enter member name" autocomplete="off">
                     </div>
 
                     <div class="form-group">
@@ -756,12 +756,12 @@
                 <div class="form-container">
                     <div class="form-group">
                         <label for="card-name">Name</label>
-                        <input type="text" id="card-name" placeholder="e.g., Chase Sapphire">
+                        <input type="text" id="card-name" placeholder="e.g., Chase Sapphire" autocomplete="off">
                     </div>
 
                     <div class="form-group">
                         <label for="card-type">Type</label>
-                        <select id="card-type">
+                        <select id="card-type" autocomplete="off">
                             <option value="credit">Credit Card</option>
                             <option value="debit">Debit Card</option>
                             <option value="cash">Cash</option>
@@ -771,7 +771,7 @@
 
                     <div class="form-group">
                         <label for="card-owner">Owner</label>
-                        <select id="card-owner">
+                        <select id="card-owner" autocomplete="off">
                             <option value="1">John Doe</option>
                             <option value="2">Jane Doe</option>
                         </select>
@@ -779,12 +779,12 @@
 
                     <div class="form-group">
                         <label for="card-limit">Credit Limit (Optional)</label>
-                        <input type="number" id="card-limit" placeholder="e.g., 5000">
+                        <input type="number" id="card-limit" placeholder="e.g., 5000" autocomplete="off">
                     </div>
 
                     <div class="form-group">
                         <label for="card-billing">Billing Day (Optional)</label>
-                        <select id="card-billing">
+                        <select id="card-billing" autocomplete="off">
                             <option value="">None</option>
                             <option value="1">1st</option>
                             <option value="5">5th</option>
@@ -889,7 +889,7 @@
                 <div class="form-container">
                     <div class="form-group">
                         <label for="category-name">Name</label>
-                        <input type="text" id="category-name" placeholder="e.g., Food & Dining">
+                        <input type="text" id="category-name" placeholder="e.g., Food & Dining" autocomplete="off">
                     </div>
 
                     <div class="form-group">
