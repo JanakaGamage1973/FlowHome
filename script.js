@@ -53,8 +53,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Add click event listeners to all navigation items
     navItems.forEach(item => {
-        item.addEventListener('click', function() {
+        item.addEventListener('click', async function(e) {
             const screenId = this.getAttribute('data-screen');
+
+            // Check if navigating to settings and PIN is enabled
+            if (screenId === 'settings-screen') {
+                const isPINEnabled = localStorage.getItem('isPINEnabled') === 'true';
+                const settingsPIN = localStorage.getItem('settingsPIN');
+
+                if (isPINEnabled && settingsPIN && !window.pinVerified) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+
+                    // Show PIN dialog (function defined later in PIN Security section)
+                    if (typeof window.showPINDialog === 'function') {
+                        const verified = await window.showPINDialog();
+                        if (verified) {
+                            window.pinVerified = true;
+                            switchScreen(screenId);
+                        }
+                        return;
+                    }
+                }
+            }
+
+            // Reset PIN verification when leaving settings
+            if (screenId !== 'settings-screen') {
+                window.pinVerified = false;
+            }
+
             switchScreen(screenId);
         });
     });
@@ -2298,7 +2325,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Store PIN in localStorage (hashed)
     let settingsPIN = localStorage.getItem('settingsPIN') || null;
     let isPINEnabled = localStorage.getItem('isPINEnabled') === 'true';
-    let pinVerified = false;
+
+    // Use window global for PIN verification state (accessible from navigation handler)
+    window.pinVerified = false;
 
     // Simple hash function for PIN storage
     function hashPIN(pin) {
@@ -2351,7 +2380,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Show PIN dialog
-    function showPINDialog() {
+    window.showPINDialog = function() {
         return new Promise((resolve) => {
             const overlay = document.getElementById('pin-dialog-overlay');
             const closeBtn = document.getElementById('pin-dialog-close');
@@ -2378,7 +2407,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 if (hashPIN(enteredPIN) === settingsPIN) {
-                    pinVerified = true;
+                    window.pinVerified = true;
                     overlay.classList.remove('show');
                     cleanup();
                     resolve(true);
@@ -2462,9 +2491,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const savePINBtn = document.getElementById('save-pin-btn');
     if (savePINBtn) {
         savePINBtn.addEventListener('click', function() {
-            const setupPIN = getPINFromInputs('#pin-setup-section .pin-input-container:first-of-type');
+            // Get setup PIN from specific inputs
+            const setupInputs = ['pin-setup-1', 'pin-setup-2', 'pin-setup-3', 'pin-setup-4'];
+            const setupPIN = setupInputs.map(id => document.getElementById(id).value).join('');
+
+            // Get confirm PIN from specific inputs
             const confirmInputs = ['pin-confirm-1', 'pin-confirm-2', 'pin-confirm-3', 'pin-confirm-4'];
             const confirmPIN = confirmInputs.map(id => document.getElementById(id).value).join('');
+
             const errorMsg = document.getElementById('pin-setup-error');
 
             if (setupPIN.length !== 4) {
@@ -2485,13 +2519,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
+            // Save PIN
             settingsPIN = hashPIN(setupPIN);
             isPINEnabled = true;
             localStorage.setItem('settingsPIN', settingsPIN);
             localStorage.setItem('isPINEnabled', 'true');
 
-            clearPINInputs('#pin-setup-section .pin-input-container:first-of-type');
+            // Clear all inputs
+            setupInputs.forEach(id => document.getElementById(id).value = '');
             confirmInputs.forEach(id => document.getElementById(id).value = '');
+
             errorMsg.style.display = 'none';
             updatePINStatusUI();
             showToast('PIN saved successfully');
@@ -2502,7 +2539,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const changePINBtn = document.getElementById('change-pin-btn');
     if (changePINBtn) {
         changePINBtn.addEventListener('click', async function() {
-            const verified = await showPINDialog();
+            const verified = await window.showPINDialog();
             if (verified) {
                 document.getElementById('pin-change-section').style.display = 'none';
                 document.getElementById('pin-setup-section').style.display = 'block';
@@ -2524,37 +2561,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 isPINEnabled = false;
                 localStorage.removeItem('settingsPIN');
                 localStorage.removeItem('isPINEnabled');
-                pinVerified = false;
+                window.pinVerified = false;
                 updatePINStatusUI();
                 showToast('PIN protection removed');
             }
         });
     }
 
-    // Intercept Settings navigation with PIN check
-    const settingsNavItem = document.querySelector('[data-screen="settings-screen"]');
-    if (settingsNavItem) {
-        const originalClickHandler = settingsNavItem.onclick;
-        settingsNavItem.addEventListener('click', async function(e) {
-            if (isPINEnabled && !pinVerified) {
-                e.stopImmediatePropagation();
-                const verified = await showPINDialog();
-                if (verified) {
-                    switchScreen('settings-screen');
-                }
-            }
-        });
-    }
-
-    // Reset PIN verification when leaving settings
-    navItems.forEach(item => {
-        item.addEventListener('click', function() {
-            const screenId = this.getAttribute('data-screen');
-            if (screenId !== 'settings-screen') {
-                pinVerified = false;
-            }
-        });
-    });
+    // Note: PIN verification is handled in the main navigation listener above
+    // This ensures proper async/await handling and prevents duplicate handlers
 
     // ==================== REFRESH CHIP SELECTORS ====================
 
