@@ -556,13 +556,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // Add to all expenses array
             allExpenses.unshift(expense);
 
-            // Add to expenses list
-            addExpenseToList(expense);
-
-            // Update totals
+            // Refresh all UI components
+            refreshExpensesList(); // Rebuild list with current month transactions and color coding
             updateTotals();
-
-            // Refresh wallets list
             refreshWalletsList();
 
             // Show undo toast
@@ -666,28 +662,13 @@ document.addEventListener('DOMContentLoaded', function() {
     function undoExpense() {
         if (!lastSavedExpense) return;
 
-        const expensesList = document.getElementById('expenses-list');
-        const emptyState = document.getElementById('empty-expenses');
-        const expenseItem = document.querySelector(`[data-expense-id="${lastSavedExpense.id}"]`);
-
-        if (expenseItem) {
-            expenseItem.remove();
-        }
-
         // Remove from allExpenses array
         allExpenses = allExpenses.filter(exp => exp.id !== lastSavedExpense.id);
 
-        // Update totals
+        // Refresh all UI components
+        refreshExpensesList(); // Rebuild list
         updateTotals();
-
-        // Refresh wallets list
         refreshWalletsList();
-
-        // Check if list is empty
-        if (expensesList.children.length === 0) {
-            emptyState.style.display = 'flex';
-            expensesList.style.display = 'none';
-        }
 
         lastSavedExpense = null;
         showToast('Undone');
@@ -1498,8 +1479,10 @@ document.addEventListener('DOMContentLoaded', function() {
             // Show success message
             showToast('Transfer saved');
 
-            // Refresh wallets list
+            // Refresh all UI components
             refreshWalletsList();
+            refreshExpensesList(); // Update home screen
+            updateTotals(); // Update totals
 
             // Return to wallet detail
             setTimeout(() => {
@@ -1586,8 +1569,10 @@ document.addEventListener('DOMContentLoaded', function() {
             // Show success message
             showToast('Deposit saved');
 
-            // Refresh wallets list
+            // Refresh all UI components
             refreshWalletsList();
+            refreshExpensesList(); // Update home screen
+            updateTotals(); // Update totals
 
             // Return to wallet detail
             setTimeout(() => {
