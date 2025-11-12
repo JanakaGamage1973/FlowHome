@@ -833,7 +833,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Refresh expenses list display (show last 5)
+    // Refresh expenses list display (show all current month transactions)
     function refreshExpensesList() {
         const expensesList = document.getElementById('expenses-list');
         const emptyState = document.getElementById('empty-expenses');
@@ -850,9 +850,30 @@ document.addEventListener('DOMContentLoaded', function() {
         emptyState.style.display = 'none';
         expensesList.style.display = 'flex';
 
-        // Show last 5 expenses
-        const last5 = allExpenses.slice(0, 5);
-        last5.forEach(expense => {
+        // Calculate current month range using month start day from profile
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const monthStartDay = profileSettings.monthStartDay || 1;
+        let thisMonthStart;
+
+        if (today.getDate() >= monthStartDay) {
+            // Current month, from monthStartDay
+            thisMonthStart = new Date(today.getFullYear(), today.getMonth(), monthStartDay);
+        } else {
+            // Previous month, from monthStartDay
+            thisMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, monthStartDay);
+        }
+        thisMonthStart.setHours(0, 0, 0, 0);
+
+        // Filter transactions for current month (including expenses, transfers, and deposits)
+        const currentMonthTransactions = allExpenses.filter(expense => {
+            const expenseDate = new Date(expense.date);
+            expenseDate.setHours(0, 0, 0, 0);
+            return expenseDate >= thisMonthStart && expenseDate <= today;
+        });
+
+        // Show all current month transactions
+        currentMonthTransactions.forEach(expense => {
             const expenseItem = document.createElement('div');
             expenseItem.className = 'expense-item';
             expenseItem.setAttribute('data-expense-id', expense.id);
@@ -862,9 +883,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 day: 'numeric'
             });
 
+            // Determine thumbnail color based on transaction type
+            let thumbnailColor;
+            let transactionLabel = '';
+
+            if (expense.isTransfer) {
+                // Wallet transactions (transfers) - use teal/sage color
+                thumbnailColor = '#6B9B8E';
+                transactionLabel = 'Transfer';
+            } else if (expense.isDeposit) {
+                // Wallet transactions (deposits) - use teal/sage color
+                thumbnailColor = '#6B9B8E';
+                transactionLabel = 'Deposit';
+            } else {
+                // Cash transactions (regular expenses) - use terracotta color
+                thumbnailColor = '#D97757';
+                transactionLabel = expense.category.name;
+            }
+
             expenseItem.innerHTML = `
-                <div class="expense-thumbnail">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <div class="expense-thumbnail" style="background-color: ${thumbnailColor};">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2">
                         <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                         <circle cx="8.5" cy="8.5" r="1.5"></circle>
                         <polyline points="21 15 16 10 5 21"></polyline>
@@ -875,7 +914,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="expense-meta">
                         <div class="expense-category">
                             <span>${expense.category.icon}</span>
-                            <span>${expense.category.name}</span>
+                            <span>${transactionLabel}</span>
                         </div>
                         <span>•</span>
                         <div class="expense-source-icon" style="background-color: ${expense.source.color};"></div>
