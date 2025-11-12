@@ -1371,6 +1371,34 @@
         </div>
     </div>
 
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+      import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyBLz8ymk9tRewYjQc2-q6jTA_jEEFXBaEQ",
+        authDomain: "flow-home-app.firebaseapp.com",
+        projectId: "flow-home-app",
+        storageBucket: "flow-home-app.firebasestorage.app",
+        messagingSenderId: "770480958107",
+        appId: "1:770480958107:web:8ef9027412ca0dd377b43e"
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      // Make Firebase available globally
+      window.firebaseApp = app;
+      window.firebaseDB = db;
+      window.firestore = { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, orderBy };
+
+      console.log('Firebase initialized successfully!');
+    </script>
+
     <script src="script.js"></script>
 </body>
 </html>
