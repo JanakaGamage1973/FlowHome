@@ -872,6 +872,10 @@ body {
 
 /* Save Button */
 .save-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
     padding: var(--spacing-md) var(--spacing-xl);
     background-color: var(--md-primary);
     color: var(--md-on-primary);
@@ -895,6 +899,12 @@ body {
     transform: scale(0.96);
     background-color: var(--md-primary-dark);
     box-shadow: var(--md-elevation-1);
+}
+
+.save-button svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
 }
 
 /* Toast Notification */
