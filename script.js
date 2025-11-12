@@ -1169,17 +1169,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 ` : ''}
             `;
-        } else if (wallet.walletSubtype === 'debit') {
-            const lowBalance = wallet.target && currentBalance < (wallet.target * 0.3);
+        } else if (wallet.walletSubtype === 'debit' || wallet.walletSubtype === 'credit') {
             statsHTML = `
                 <div class="wallet-stat">
-                    <div class="wallet-stat-label">Balance / Target</div>
-                    <div class="wallet-stat-value ${lowBalance ? 'negative' : 'positive'}">${getCurrencySymbol()} ${formatCurrency(currentBalance)} / ${formatCurrency(wallet.target || 0)}</div>
+                    <div class="wallet-stat-label">Balance</div>
+                    <div class="wallet-stat-value positive">${getCurrencySymbol()} ${formatCurrency(currentBalance)}</div>
                 </div>
+                ${stats.payInsThisMonth > 0 ? `
+                    <div class="wallet-stat">
+                        <div class="wallet-stat-label">Pay-ins this month</div>
+                        <div class="wallet-stat-value">${stats.payInsThisMonth}</div>
+                    </div>
+                ` : ''}
             `;
-            if (lowBalance) {
-                extraInfoHTML = '<div class="wallet-hint">⚠️ Low balance</div>';
-            }
         } else {
             statsHTML = `
                 <div class="wallet-stat">
@@ -1234,7 +1236,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Add transfers
+        // Add transfers and count incoming transfers this month
         allExpenses.forEach(expense => {
             if (expense.isTransfer) {
                 if (expense.transferFrom === walletId) {
@@ -1242,6 +1244,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 if (expense.transferTo === walletId) {
                     balance += expense.amount;
+
+                    // Count incoming transfers in current month as pay-ins
+                    if (expense.date) {
+                        const expenseDate = new Date(expense.date);
+                        if (expenseDate.getMonth() === currentMonth && expenseDate.getFullYear() === currentYear) {
+                            payInsThisMonth++;
+                        }
+                    }
                 }
             }
         });
