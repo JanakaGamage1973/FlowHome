@@ -1919,6 +1919,8 @@ document.addEventListener('DOMContentLoaded', function() {
         refreshWalletsList();
         refreshSourceChips();
         refreshSearchFilters();
+        refreshExpensesList(); // Refresh home screen to reflect wallet changes
+        updateTotals();
 
         showToast('Saved');
         setTimeout(() => {
@@ -1948,6 +1950,8 @@ document.addEventListener('DOMContentLoaded', function() {
         refreshWalletsList();
         refreshSourceChips();
         refreshSearchFilters();
+        refreshExpensesList(); // Refresh home screen to reflect wallet changes
+        updateTotals();
 
         showToast('Deleted');
         setTimeout(() => {
@@ -2075,6 +2079,7 @@ document.addEventListener('DOMContentLoaded', function() {
         refreshCategoriesList();
         refreshCategoryChips();
         refreshSearchFilters();
+        refreshExpensesList(); // Refresh home screen to reflect category changes
 
         showToast('Saved');
         setTimeout(() => {
@@ -2103,6 +2108,7 @@ document.addEventListener('DOMContentLoaded', function() {
         refreshCategoriesList();
         refreshCategoryChips();
         refreshSearchFilters();
+        refreshExpensesList(); // Refresh home screen to reflect category changes
 
         showToast('Deleted');
         setTimeout(() => {
@@ -2601,18 +2607,26 @@ document.addEventListener('DOMContentLoaded', function() {
             day: 'numeric'
         });
 
-        // Determine display based on type
+        // Determine display based on type with consistent color coding
         let categoryDisplay = expense.category.name;
         let categoryIcon = expense.category.icon;
+        let thumbnailColor;
 
         if (expense.isTransfer) {
             categoryDisplay = 'Transfer';
             categoryIcon = '🔄';
+            thumbnailColor = '#6B9B8E'; // Teal for wallet transactions
+        } else if (expense.isDeposit) {
+            categoryDisplay = 'Deposit';
+            categoryIcon = expense.category.icon;
+            thumbnailColor = '#6B9B8E'; // Teal for wallet transactions
+        } else {
+            thumbnailColor = '#D97757'; // Terracotta for cash transactions
         }
 
         item.innerHTML = `
-            <div class="expense-thumbnail">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <div class="expense-thumbnail" style="background-color: ${thumbnailColor};">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2">
                     <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                     <circle cx="8.5" cy="8.5" r="1.5"></circle>
                     <polyline points="21 15 16 10 5 21"></polyline>
@@ -2637,6 +2651,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (expense.isTransfer) {
                 // For transfers, show a toast (or could open a transfer detail screen)
                 showToast('Transfer details');
+            } else if (expense.isDeposit) {
+                showToast('Deposit details');
             } else {
                 openEditScreen(expense.id);
             }
