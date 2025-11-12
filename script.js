@@ -95,6 +95,54 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 2000);
     }
 
+    // Custom confirmation dialog
+    function showConfirmDialog(message) {
+        return new Promise((resolve) => {
+            const overlay = document.getElementById('confirm-dialog-overlay');
+            const messageEl = document.getElementById('confirm-dialog-message');
+            const cancelBtn = document.getElementById('confirm-cancel-btn');
+            const okBtn = document.getElementById('confirm-ok-btn');
+
+            messageEl.textContent = message;
+
+            // Show dialog with animation
+            overlay.classList.add('show');
+
+            // Handle OK button
+            const handleOk = () => {
+                overlay.classList.remove('show');
+                cleanup();
+                resolve(true);
+            };
+
+            // Handle Cancel button
+            const handleCancel = () => {
+                overlay.classList.remove('show');
+                cleanup();
+                resolve(false);
+            };
+
+            // Handle overlay click (cancel)
+            const handleOverlayClick = (e) => {
+                if (e.target === overlay) {
+                    handleCancel();
+                }
+            };
+
+            // Cleanup event listeners
+            const cleanup = () => {
+                okBtn.removeEventListener('click', handleOk);
+                cancelBtn.removeEventListener('click', handleCancel);
+                overlay.removeEventListener('click', handleOverlayClick);
+            };
+
+            // Add event listeners
+            okBtn.addEventListener('click', handleOk);
+            cancelBtn.addEventListener('click', handleCancel);
+            overlay.addEventListener('click', handleOverlayClick);
+        });
+    }
+
     // ==================== PROFILE SCREEN ====================
 
     // Profile settings object
@@ -1726,14 +1774,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 500);
     }
 
-    function deleteMember() {
+    async function deleteMember() {
         if (!currentEditingMemberId) return;
 
         const member = allMembers.find(m => m.id === currentEditingMemberId);
         if (!member) return;
 
-        // Confirm deletion
-        if (!confirm(`Are you sure you want to delete ${member.name}?`)) {
+        // Confirm deletion with custom dialog
+        const confirmed = await showConfirmDialog(`Are you sure you want to delete ${member.name}?`);
+        if (!confirmed) {
             return;
         }
 
@@ -1923,14 +1972,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 500);
     }
 
-    function deleteCard() {
+    async function deleteCard() {
         if (!currentEditingCardId) return;
 
         const wallet = allWallets.find(w => w.id === currentEditingCardId);
         if (!wallet) return;
 
-        // Confirm deletion
-        if (!confirm(`Are you sure you want to delete ${wallet.name}?`)) {
+        // Confirm deletion with custom dialog
+        const confirmed = await showConfirmDialog(`Are you sure you want to delete ${wallet.name}?`);
+        if (!confirmed) {
             return;
         }
 
@@ -2082,14 +2132,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 500);
     }
 
-    function deleteCategory() {
+    async function deleteCategory() {
         if (!currentEditingCategoryId) return;
 
         const category = allCategories.find(c => c.id === currentEditingCategoryId);
         if (!category) return;
 
-        // Confirm deletion
-        if (!confirm(`Are you sure you want to delete ${category.name}?`)) {
+        // Confirm deletion with custom dialog
+        const confirmed = await showConfirmDialog(`Are you sure you want to delete ${category.name}?`);
+        if (!confirmed) {
             return;
         }
 
