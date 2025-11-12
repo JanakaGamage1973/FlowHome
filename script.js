@@ -78,9 +78,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Number formatting function
-    function formatCurrency(amount) {
+    function formatCurrency(amount, includeSymbol = false) {
         // Round to whole number and add comma separators
-        return Math.round(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        const formatted = Math.round(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        return includeSymbol ? `${getCurrencySymbol()} ${formatted}` : formatted;
     }
 
     // Toast notification function
@@ -96,14 +97,71 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ==================== PROFILE SCREEN ====================
 
+    // Profile settings object
+    let profileSettings = {
+        name: 'John Doe',
+        currency: 'LKR',
+        currencySymbol: 'Rs',
+        language: 'en',
+        monthStartDay: 1,
+        appLock: false
+    };
+
+    // Currency symbols map
+    const currencySymbols = {
+        'LKR': 'Rs',
+        'USD': '$',
+        'EUR': '€',
+        'GBP': '£',
+        'JPY': '¥',
+        'INR': '₹'
+    };
+
+    // Get currency symbol helper
+    function getCurrencySymbol() {
+        return profileSettings.currencySymbol;
+    }
+
     // Auto-save on profile changes
     const profileInputs = document.querySelectorAll('#profile-screen input, #profile-screen select');
     profileInputs.forEach(input => {
         input.addEventListener('change', function() {
-            // Simulate saving
+            // Update profile settings
+            const inputId = this.id;
+            if (inputId === 'profile-name') {
+                profileSettings.name = this.value;
+            } else if (inputId === 'profile-currency') {
+                profileSettings.currency = this.value;
+                profileSettings.currencySymbol = currencySymbols[this.value] || 'Rs';
+                // Update all currency displays
+                updateAllCurrencyDisplays();
+            } else if (inputId === 'profile-language') {
+                profileSettings.language = this.value;
+            } else if (inputId === 'profile-monthstart') {
+                profileSettings.monthStartDay = parseInt(this.value);
+                // Recalculate month totals
+                updateTotals();
+            } else if (inputId === 'profile-applock') {
+                profileSettings.appLock = this.checked;
+            }
+
             showToast('Saved');
         });
     });
+
+    // Update all currency displays in the UI
+    function updateAllCurrencyDisplays() {
+        const symbol = getCurrencySymbol();
+
+        // Update all currency text
+        document.querySelectorAll('.currency-symbol').forEach(el => {
+            el.textContent = symbol;
+        });
+
+        // Refresh totals and wallet displays
+        updateTotals();
+        if (typeof renderWalletsList === 'function') renderWalletsList();
+    }
 
     // ==================== FAMILY MEMBERS SCREEN ====================
 
@@ -426,6 +484,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 chips.forEach(c => c.classList.remove('active'));
                 // Add active to clicked chip
                 this.classList.add('active');
+
+                // If this is a category chip, auto-select its default wallet
+                if (selector.id === 'category-chips' || selector.id === 'edit-category-chips') {
+                    const categoryId = this.getAttribute('data-category');
+                    const category = allCategories.find(cat => cat.id === categoryId);
+
+                    if (category && category.defaultWallet) {
+                        // Auto-select the default wallet/source for this category
+                        const sourceChipsId = selector.id === 'category-chips' ? 'source-chips' : 'edit-source-chips';
+                        const sourceChips = document.getElementById(sourceChipsId);
+
+                        if (sourceChips) {
+                            const targetSourceChip = sourceChips.querySelector(`[data-source="${category.defaultWallet}"]`);
+                            if (targetSourceChip) {
+                                // Remove active from all source chips
+                                sourceChips.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+                                // Activate the default wallet
+                                targetSourceChip.classList.add('active');
+                            }
+                        }
+                    }
+                }
             });
         });
     });
@@ -526,7 +606,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </svg>
             </div>
             <div class="expense-details">
-                <div class="expense-amount">Rs ${formatCurrency(expense.amount)}</div>
+                <div class="expense-amount">${getCurrencySymbol()} ${formatCurrency(expense.amount)}</div>
                 <div class="expense-meta">
                     <div class="expense-category">
                         <span>${expense.category.icon}</span>
@@ -791,7 +871,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </svg>
                 </div>
                 <div class="expense-details">
-                    <div class="expense-amount">Rs ${formatCurrency(expense.amount)}</div>
+                    <div class="expense-amount">${getCurrencySymbol()} ${formatCurrency(expense.amount)}</div>
                     <div class="expense-meta">
                         <div class="expense-category">
                             <span>${expense.category.icon}</span>
@@ -820,7 +900,18 @@ document.addEventListener('DOMContentLoaded', function() {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        const thisMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+        // Use month start day from profile settings
+        const monthStartDay = profileSettings.monthStartDay || 1;
+        let thisMonthStart;
+
+        if (today.getDate() >= monthStartDay) {
+            // Current month, from monthStartDay
+            thisMonthStart = new Date(today.getFullYear(), today.getMonth(), monthStartDay);
+        } else {
+            // Previous month, from monthStartDay
+            thisMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, monthStartDay);
+        }
+        thisMonthStart.setHours(0, 0, 0, 0);
 
         let todayTotal = 0;
         let monthTotal = 0;
@@ -837,15 +928,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 todayTotal += expense.amount;
             }
 
-            // Check if expense is this month
-            if (expenseDate >= thisMonthStart) {
+            // Check if expense is this month (from month start day)
+            if (expenseDate >= thisMonthStart && expenseDate <= today) {
                 monthTotal += expense.amount;
             }
         });
 
-        // Update display
-        document.getElementById('today-total').textContent = `Rs ${formatCurrency(todayTotal)}`;
-        document.getElementById('month-total').textContent = `Rs ${formatCurrency(monthTotal)}`;
+        // Update display with currency symbol from profile
+        const symbol = getCurrencySymbol();
+        document.getElementById('today-total').textContent = `${symbol} ${formatCurrency(todayTotal)}`;
+        document.getElementById('month-total').textContent = `${symbol} ${formatCurrency(monthTotal)}`;
     }
 
     // ==================== WALLETS FUNCTIONALITY ====================
@@ -1048,7 +1140,7 @@ document.addEventListener('DOMContentLoaded', function() {
             statsHTML = `
                 <div class="wallet-stat">
                     <div class="wallet-stat-label">Balance</div>
-                    <div class="wallet-stat-value positive">Rs ${formatCurrency(currentBalance)}</div>
+                    <div class="wallet-stat-value positive">${getCurrencySymbol()} ${formatCurrency(currentBalance)}</div>
                 </div>
                 ${wallet.payInCount ? `
                     <div class="wallet-stat">
@@ -1062,7 +1154,7 @@ document.addEventListener('DOMContentLoaded', function() {
             statsHTML = `
                 <div class="wallet-stat">
                     <div class="wallet-stat-label">Balance / Target</div>
-                    <div class="wallet-stat-value ${lowBalance ? 'negative' : 'positive'}">Rs ${formatCurrency(currentBalance)} / ${formatCurrency(wallet.target || 0)}</div>
+                    <div class="wallet-stat-value ${lowBalance ? 'negative' : 'positive'}">${getCurrencySymbol()} ${formatCurrency(currentBalance)} / ${formatCurrency(wallet.target || 0)}</div>
                 </div>
             `;
             if (lowBalance) {
@@ -1072,7 +1164,7 @@ document.addEventListener('DOMContentLoaded', function() {
             statsHTML = `
                 <div class="wallet-stat">
                     <div class="wallet-stat-label">Balance</div>
-                    <div class="wallet-stat-value positive">Rs ${formatCurrency(currentBalance)}</div>
+                    <div class="wallet-stat-value positive">${getCurrencySymbol()} ${formatCurrency(currentBalance)}</div>
                 </div>
             `;
         }
@@ -1103,7 +1195,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Calculate wallet statistics
     function calculateWalletStats(walletId) {
         let spent = 0;
-        let balance = 0;
+
+        // Get wallet initial balance
+        const wallet = allWallets.find(w => w.id === walletId);
+        let balance = wallet && wallet.balance !== undefined ? wallet.balance : 0;
 
         // Get all expenses for this wallet
         allExpenses.forEach(expense => {
@@ -1125,7 +1220,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        const wallet = allWallets.find(w => w.id === walletId);
         const remaining = wallet && wallet.limit ? wallet.limit - spent : balance;
 
         return { spent, balance, remaining };
@@ -1145,18 +1239,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Update balance display
         if (wallet.limit) {
-            document.getElementById('wallet-balance').textContent = `Rs ${formatCurrency(stats.remaining)}`;
+            document.getElementById('wallet-balance').textContent = `${getCurrencySymbol()} ${formatCurrency(stats.remaining)}`;
             document.getElementById('wallet-limit-info').style.display = 'block';
-            document.getElementById('wallet-limit').textContent = `Rs ${formatCurrency(wallet.limit)}`;
+            document.getElementById('wallet-limit').textContent = `${getCurrencySymbol()} ${formatCurrency(wallet.limit)}`;
             document.getElementById('wallet-progress-container').style.display = 'block';
-            document.getElementById('wallet-spent').textContent = `Rs ${formatCurrency(stats.spent)}`;
-            document.getElementById('wallet-remaining').textContent = `Rs ${formatCurrency(stats.remaining)}`;
+            document.getElementById('wallet-spent').textContent = `${getCurrencySymbol()} ${formatCurrency(stats.spent)}`;
+            document.getElementById('wallet-remaining').textContent = `${getCurrencySymbol()} ${formatCurrency(stats.remaining)}`;
 
             // Update progress bar
             const percentage = (stats.spent / wallet.limit) * 100;
             document.getElementById('wallet-progress-fill').style.width = `${Math.min(percentage, 100)}%`;
         } else {
-            document.getElementById('wallet-balance').textContent = `Rs ${formatCurrency(stats.balance)}`;
+            document.getElementById('wallet-balance').textContent = `${getCurrencySymbol()} ${formatCurrency(stats.balance)}`;
             document.getElementById('wallet-limit-info').style.display = 'none';
             document.getElementById('wallet-progress-container').style.display = 'none';
         }
@@ -1205,12 +1299,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (transaction.isTransfer) {
                 const isIncoming = transaction.transferTo === walletId;
-                amount = isIncoming ? `+Rs ${formatCurrency(transaction.amount)}` : `-Rs ${formatCurrency(transaction.amount)}`;
+                amount = isIncoming ? `+${getCurrencySymbol()} ${formatCurrency(transaction.amount)}` : `-${getCurrencySymbol()} ${formatCurrency(transaction.amount)}`;
                 amountClass = isIncoming ? 'positive' : 'negative';
                 icon = '🔄';
                 name = transaction.note || 'Transfer';
             } else {
-                amount = `-Rs ${formatCurrency(transaction.amount)}`;
+                amount = `-${getCurrencySymbol()} ${formatCurrency(transaction.amount)}`;
                 amountClass = 'negative';
                 icon = transaction.category.icon;
                 name = transaction.category.name;
@@ -2353,7 +2447,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </svg>
             </div>
             <div class="expense-details">
-                <div class="expense-amount">Rs ${formatCurrency(expense.amount)}</div>
+                <div class="expense-amount">${getCurrencySymbol()} ${formatCurrency(expense.amount)}</div>
                 <div class="expense-meta">
                     <div class="expense-category">
                         <span>${categoryIcon}</span>
@@ -2463,7 +2557,7 @@ document.addEventListener('DOMContentLoaded', function() {
             categoryTotals[a] > categoryTotals[b] ? a : b, '-');
 
         // Update summary cards
-        document.getElementById('total-expenses-value').textContent = `Rs ${formatCurrency(totalExpenses)}`;
+        document.getElementById('total-expenses-value').textContent = `${getCurrencySymbol()} ${formatCurrency(totalExpenses)}`;
         document.getElementById('entries-count-value').textContent = entriesCount;
         document.getElementById('top-category-value').textContent = topCategory;
 
@@ -2535,7 +2629,7 @@ document.addEventListener('DOMContentLoaded', function() {
             legendItem.innerHTML = `
                 <div class="legend-color" style="background-color: ${cat.color};"></div>
                 <span class="legend-label">${cat.icon} ${cat.name}</span>
-                <span class="legend-value">Rs ${formatCurrency(cat.total)}</span>
+                <span class="legend-value">${getCurrencySymbol()} ${formatCurrency(cat.total)}</span>
             `;
             legend.appendChild(legendItem);
         });
@@ -2574,7 +2668,7 @@ document.addEventListener('DOMContentLoaded', function() {
             barItem.innerHTML = `
                 <div class="bar-header">
                     <span class="bar-member">${member.name}</span>
-                    <span class="bar-amount">Rs ${formatCurrency(member.total)}</span>
+                    <span class="bar-amount">${getCurrencySymbol()} ${formatCurrency(member.total)}</span>
                 </div>
                 <div class="bar-track">
                     <div class="bar-fill" style="width: ${percentage}%;"></div>
@@ -2618,7 +2712,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <text class="ring-center-text" x="50" y="55" text-anchor="middle">${Math.round(percentage)}%</text>
                 </svg>
                 <div class="ring-label">${wallet.name}</div>
-                <div class="ring-sublabel">Rs ${formatCurrency(spent)} / Rs ${formatCurrency(wallet.limit)}</div>
+                <div class="ring-sublabel">${getCurrencySymbol()} ${formatCurrency(spent)} / ${getCurrencySymbol()} ${formatCurrency(wallet.limit)}</div>
             `;
             ringCharts.appendChild(ringItem);
         });
