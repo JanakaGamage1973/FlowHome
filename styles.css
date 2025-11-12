@@ -472,7 +472,7 @@ body {
     background-color: var(--md-surface-1);
     color: var(--md-on-surface);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: var(--md-elevation-1);
+    box-shadow: none;
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -489,7 +489,7 @@ body {
 .form-group select:focus {
     outline: none;
     border-color: var(--md-primary);
-    box-shadow: var(--md-focus-ring), var(--md-elevation-2);
+    box-shadow: none;
     transform: translateY(-1px);
 }
 
@@ -1349,7 +1349,9 @@ body {
     background-color: var(--md-surface-1);
     color: var(--md-on-surface);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: var(--md-elevation-1);
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -1358,7 +1360,9 @@ body {
 .date-input:focus {
     outline: none;
     border-color: var(--md-primary);
-    box-shadow: var(--md-focus-ring), var(--md-elevation-2);
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
     transform: translateY(-1px);
 }
 
@@ -1558,7 +1562,9 @@ textarea {
     color: var(--md-on-surface);
     resize: vertical;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: var(--md-elevation-1);
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
 }
 
 #edit-entry-screen textarea {
@@ -1568,7 +1574,9 @@ textarea {
 textarea:focus {
     outline: none;
     border-color: var(--md-primary);
-    box-shadow: var(--md-focus-ring), var(--md-elevation-2);
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
     transform: translateY(-1px);
 }
 
@@ -1987,7 +1995,9 @@ textarea::placeholder {
     background-color: var(--md-surface-1);
     color: var(--md-on-surface);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: var(--md-elevation-1);
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -2000,7 +2010,9 @@ textarea::placeholder {
 .transfer-select:focus {
     outline: none;
     border-color: var(--md-primary);
-    box-shadow: var(--md-focus-ring), var(--md-elevation-2);
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
     transform: translateY(-1px);
 }
 
