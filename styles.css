@@ -1266,6 +1266,12 @@ body {
     background: none;
     color: var(--md-on-surface);
     min-width: 0;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 
 .amount-input-wrapper input::placeholder {
