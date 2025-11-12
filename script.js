@@ -1121,7 +1121,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Calculate wallet stats
         const stats = calculateWalletStats(wallet.id);
-        const currentBalance = wallet.balance !== undefined ? wallet.balance : stats.balance;
+        const currentBalance = stats.balance;
 
         let iconSvg = '';
         if (wallet.icon === 'card') {
@@ -1142,10 +1142,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="wallet-stat-label">Balance</div>
                     <div class="wallet-stat-value positive">${getCurrencySymbol()} ${formatCurrency(currentBalance)}</div>
                 </div>
-                ${wallet.payInCount ? `
+                ${stats.payInsThisMonth > 0 ? `
                     <div class="wallet-stat">
                         <div class="wallet-stat-label">Pay-ins this month</div>
-                        <div class="wallet-stat-value">${wallet.payInCount}</div>
+                        <div class="wallet-stat-value">${stats.payInsThisMonth}</div>
                     </div>
                 ` : ''}
             `;
@@ -1195,10 +1195,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Calculate wallet statistics
     function calculateWalletStats(walletId) {
         let spent = 0;
+        let payInsThisMonth = 0;
 
         // Get wallet initial balance
         const wallet = allWallets.find(w => w.id === walletId);
         let balance = wallet && wallet.balance !== undefined ? wallet.balance : 0;
+
+        // Get current month/year
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
 
         // Get all expenses for this wallet
         allExpenses.forEach(expense => {
@@ -1220,16 +1226,24 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Add deposits
+        // Add deposits and count pay-ins this month
         allExpenses.forEach(expense => {
             if (expense.isDeposit && expense.depositTo === walletId) {
                 balance += expense.amount;
+
+                // Count if deposit is in current month
+                if (expense.date) {
+                    const expenseDate = new Date(expense.date);
+                    if (expenseDate.getMonth() === currentMonth && expenseDate.getFullYear() === currentYear) {
+                        payInsThisMonth++;
+                    }
+                }
             }
         });
 
         const remaining = wallet && wallet.limit ? wallet.limit - spent : balance;
 
-        return { spent, balance, remaining };
+        return { spent, balance, remaining, payInsThisMonth };
     }
 
     // Open wallet detail screen
