@@ -1918,6 +1918,14 @@ textarea::placeholder {
     flex-direction: column-reverse;
     gap: 12px;
     align-items: flex-end;
+    z-index: 100;
+}
+
+/* Center FAB within app container for desktop view */
+@media (min-width: 429px) {
+    .fab-container {
+        right: calc(50% - 214px + 20px);
+    }
 }
 
 .fab-container .floating-action-button {
