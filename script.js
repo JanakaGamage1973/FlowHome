@@ -31,6 +31,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // Reset capture screen when navigating to it and auto-open camera
         if (targetScreenId === 'capture-screen') {
             resetCaptureScreen();
+
+            // Refresh all chip selectors to reflect latest Settings changes
+            refreshCategoryChips();
+            refreshSourceChips();
+            refreshMemberChips();
+
             // Auto-trigger camera/photo picker when capture screen opens
             setTimeout(() => {
                 const photoInput = document.getElementById('photo-input');
@@ -2190,6 +2196,43 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
 
+        // Refresh category chips in Review Expense screen
+        const reviewContainer = document.querySelector('#category-chips');
+        if (reviewContainer) {
+            // Store currently selected category
+            const currentActive = reviewContainer.querySelector('.chip.active');
+            const currentActiveId = currentActive ? currentActive.getAttribute('data-category') : null;
+
+            reviewContainer.innerHTML = '';
+            allCategories.forEach((category, index) => {
+                const chip = document.createElement('button');
+                chip.className = 'chip';
+                chip.setAttribute('data-category', category.id);
+                chip.setAttribute('data-icon', category.icon);
+                chip.setAttribute('data-color', category.color);
+
+                // Mark as active if it was previously selected, or first item if none selected
+                if (category.id === currentActiveId || (!currentActiveId && index === 0)) {
+                    chip.classList.add('active');
+                }
+
+                chip.innerHTML = `
+                    <span class="chip-icon">${category.icon}</span>
+                    <span class="chip-label">${category.name}</span>
+                `;
+                reviewContainer.appendChild(chip);
+            });
+        }
+
+        // Re-attach click handlers for review expense chips
+        const reviewChips = document.querySelectorAll('#category-chips .chip');
+        reviewChips.forEach(chip => {
+            chip.addEventListener('click', function() {
+                reviewChips.forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
         // Refresh category chips in Edit Entry screen
         const editContainer = document.querySelector('#edit-category-chips');
         if (editContainer) {
@@ -2244,6 +2287,41 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
 
+        // Refresh member chips in Review Expense screen
+        const reviewContainer = document.querySelector('#member-chips');
+        if (reviewContainer) {
+            // Store currently selected member
+            const currentActive = reviewContainer.querySelector('.chip.active');
+            const currentActiveMemberId = currentActive ? currentActive.getAttribute('data-member') : null;
+
+            reviewContainer.innerHTML = '';
+            allMembers.forEach((member, index) => {
+                const chip = document.createElement('button');
+                chip.className = 'chip';
+                chip.setAttribute('data-member', member.id);
+                chip.setAttribute('data-color', member.color);
+
+                // Mark as active if it was previously selected, or first item if none selected
+                if (member.id === currentActiveMemberId || (!currentActiveMemberId && index === 0)) {
+                    chip.classList.add('active');
+                }
+
+                chip.innerHTML = `
+                    <span class="chip-label">${member.name}</span>
+                `;
+                reviewContainer.appendChild(chip);
+            });
+        }
+
+        // Re-attach click handlers for review expense chips
+        const reviewChips = document.querySelectorAll('#member-chips .chip');
+        reviewChips.forEach(chip => {
+            chip.addEventListener('click', function() {
+                reviewChips.forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
         // Refresh member chips in Edit Entry screen
         const editContainer = document.querySelector('#edit-member-chips');
         if (editContainer) {
@@ -2292,6 +2370,41 @@ document.addEventListener('DOMContentLoaded', function() {
         captureChips.forEach(chip => {
             chip.addEventListener('click', function() {
                 captureChips.forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Refresh source chips in Review Expense screen
+        const reviewContainer = document.querySelector('#source-chips');
+        if (reviewContainer) {
+            // Store currently selected source
+            const currentActive = reviewContainer.querySelector('.chip.active');
+            const currentActiveSourceId = currentActive ? currentActive.getAttribute('data-source') : null;
+
+            reviewContainer.innerHTML = '';
+            allWallets.forEach((wallet, index) => {
+                const chip = document.createElement('button');
+                chip.className = 'chip';
+                chip.setAttribute('data-source', wallet.id);
+                chip.setAttribute('data-color', wallet.color);
+
+                // Mark as active if it was previously selected, or first item if none selected
+                if (wallet.id === currentActiveSourceId || (!currentActiveSourceId && index === 0)) {
+                    chip.classList.add('active');
+                }
+
+                chip.innerHTML = `
+                    <span class="chip-label">${wallet.name}</span>
+                `;
+                reviewContainer.appendChild(chip);
+            });
+        }
+
+        // Re-attach click handlers for review expense chips
+        const reviewChips = document.querySelectorAll('#source-chips .chip');
+        reviewChips.forEach(chip => {
+            chip.addEventListener('click', function() {
+                reviewChips.forEach(c => c.classList.remove('active'));
                 this.classList.add('active');
             });
         });
