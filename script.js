@@ -869,16 +869,16 @@ document.addEventListener('DOMContentLoaded', function() {
             let transactionLabel = '';
 
             if (expense.isTransfer) {
-                // Wallet transactions (transfers) - use teal/sage color
-                thumbnailColor = '#6B9B8E';
+                // Wallet transactions (transfers) - use source wallet color
+                thumbnailColor = expense.source.color;
                 transactionLabel = 'Transfer';
             } else if (expense.isDeposit) {
-                // Wallet transactions (deposits) - use teal/sage color
-                thumbnailColor = '#6B9B8E';
+                // Wallet transactions (deposits) - use source wallet color
+                thumbnailColor = expense.source.color;
                 transactionLabel = 'Deposit';
             } else {
-                // Cash transactions (regular expenses) - use terracotta color
-                thumbnailColor = '#D97757';
+                // Regular expenses - use category color
+                thumbnailColor = expense.category.color;
                 transactionLabel = expense.category.name;
             }
 
@@ -2600,13 +2600,13 @@ document.addEventListener('DOMContentLoaded', function() {
         if (expense.isTransfer) {
             categoryDisplay = 'Transfer';
             categoryIcon = '🔄';
-            thumbnailColor = '#6B9B8E'; // Teal for wallet transactions
+            thumbnailColor = expense.source.color; // Use source wallet color
         } else if (expense.isDeposit) {
             categoryDisplay = 'Deposit';
             categoryIcon = expense.category.icon;
-            thumbnailColor = '#6B9B8E'; // Teal for wallet transactions
+            thumbnailColor = expense.source.color; // Use source wallet color
         } else {
-            thumbnailColor = '#D97757'; // Terracotta for cash transactions
+            thumbnailColor = expense.category.color; // Use category color
         }
 
         item.innerHTML = `
