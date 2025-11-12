@@ -2293,6 +2293,269 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // ==================== PIN SECURITY FUNCTIONALITY ====================
+
+    // Store PIN in localStorage (hashed)
+    let settingsPIN = localStorage.getItem('settingsPIN') || null;
+    let isPINEnabled = localStorage.getItem('isPINEnabled') === 'true';
+    let pinVerified = false;
+
+    // Simple hash function for PIN storage
+    function hashPIN(pin) {
+        let hash = 0;
+        for (let i = 0; i < pin.length; i++) {
+            const char = pin.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash;
+        }
+        return hash.toString();
+    }
+
+    // Setup PIN input auto-focus and auto-advance
+    function setupPINInputs(containerSelector) {
+        const inputs = document.querySelectorAll(`${containerSelector} .pin-input`);
+
+        inputs.forEach((input, index) => {
+            input.addEventListener('input', function(e) {
+                this.value = this.value.replace(/[^0-9]/g, '');
+                if (this.value.length === 1 && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+            });
+
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && this.value === '' && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+        });
+    }
+
+    // Setup all PIN input containers
+    setupPINInputs('#pin-dialog-overlay');
+    setupPINInputs('#pin-setup-section');
+
+    // Get PIN from inputs
+    function getPINFromInputs(containerSelector) {
+        const inputs = document.querySelectorAll(`${containerSelector} .pin-input`);
+        let pin = '';
+        inputs.forEach(input => pin += input.value);
+        return pin;
+    }
+
+    // Clear PIN inputs
+    function clearPINInputs(containerSelector) {
+        const inputs = document.querySelectorAll(`${containerSelector} .pin-input`);
+        inputs.forEach(input => input.value = '');
+        if (inputs.length > 0) inputs[0].focus();
+    }
+
+    // Show PIN dialog
+    function showPINDialog() {
+        return new Promise((resolve) => {
+            const overlay = document.getElementById('pin-dialog-overlay');
+            const closeBtn = document.getElementById('pin-dialog-close');
+            const cancelBtn = document.getElementById('pin-cancel-btn');
+            const verifyBtn = document.getElementById('pin-verify-btn');
+            const errorMsg = document.getElementById('pin-error-message');
+
+            overlay.classList.add('show');
+            errorMsg.style.display = 'none';
+            clearPINInputs('#pin-dialog-overlay');
+
+            setTimeout(() => {
+                const firstInput = document.getElementById('pin-digit-1');
+                if (firstInput) firstInput.focus();
+            }, 100);
+
+            const handleVerify = () => {
+                const enteredPIN = getPINFromInputs('#pin-dialog-overlay');
+
+                if (enteredPIN.length !== 4) {
+                    errorMsg.textContent = 'Please enter all 4 digits';
+                    errorMsg.style.display = 'block';
+                    return;
+                }
+
+                if (hashPIN(enteredPIN) === settingsPIN) {
+                    pinVerified = true;
+                    overlay.classList.remove('show');
+                    cleanup();
+                    resolve(true);
+                } else {
+                    errorMsg.textContent = 'Incorrect PIN. Please try again.';
+                    errorMsg.style.display = 'block';
+                    clearPINInputs('#pin-dialog-overlay');
+                }
+            };
+
+            const handleCancel = () => {
+                overlay.classList.remove('show');
+                cleanup();
+                resolve(false);
+            };
+
+            const cleanup = () => {
+                verifyBtn.removeEventListener('click', handleVerify);
+                cancelBtn.removeEventListener('click', handleCancel);
+                closeBtn.removeEventListener('click', handleCancel);
+            };
+
+            verifyBtn.addEventListener('click', handleVerify);
+            cancelBtn.addEventListener('click', handleCancel);
+            closeBtn.addEventListener('click', handleCancel);
+        });
+    }
+
+    // Update PIN status UI
+    function updatePINStatusUI() {
+        const statusText = document.getElementById('pin-status-text');
+        const toggle = document.getElementById('pin-enabled-toggle');
+        const setupSection = document.getElementById('pin-setup-section');
+        const changeSection = document.getElementById('pin-change-section');
+
+        if (isPINEnabled && settingsPIN) {
+            statusText.textContent = 'PIN protection is enabled';
+            toggle.checked = true;
+            setupSection.style.display = 'none';
+            changeSection.style.display = 'block';
+        } else {
+            statusText.textContent = 'PIN protection is disabled';
+            toggle.checked = false;
+            setupSection.style.display = 'none';
+            changeSection.style.display = 'none';
+        }
+    }
+
+    updatePINStatusUI();
+
+    // PIN toggle handler
+    const pinToggle = document.getElementById('pin-enabled-toggle');
+    if (pinToggle) {
+        pinToggle.addEventListener('change', function() {
+            const setupSection = document.getElementById('pin-setup-section');
+
+            if (this.checked) {
+                if (!settingsPIN) {
+                    setupSection.style.display = 'block';
+                    setTimeout(() => {
+                        const firstInput = document.getElementById('pin-setup-1');
+                        if (firstInput) firstInput.focus();
+                    }, 100);
+                } else {
+                    isPINEnabled = true;
+                    localStorage.setItem('isPINEnabled', 'true');
+                    updatePINStatusUI();
+                    showToast('PIN protection enabled');
+                }
+            } else {
+                isPINEnabled = false;
+                localStorage.setItem('isPINEnabled', 'false');
+                setupSection.style.display = 'none';
+                updatePINStatusUI();
+                showToast('PIN protection disabled');
+            }
+        });
+    }
+
+    // Save PIN button
+    const savePINBtn = document.getElementById('save-pin-btn');
+    if (savePINBtn) {
+        savePINBtn.addEventListener('click', function() {
+            const setupPIN = getPINFromInputs('#pin-setup-section .pin-input-container:first-of-type');
+            const confirmInputs = ['pin-confirm-1', 'pin-confirm-2', 'pin-confirm-3', 'pin-confirm-4'];
+            const confirmPIN = confirmInputs.map(id => document.getElementById(id).value).join('');
+            const errorMsg = document.getElementById('pin-setup-error');
+
+            if (setupPIN.length !== 4) {
+                errorMsg.textContent = 'Please enter a 4-digit PIN';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            if (confirmPIN.length !== 4) {
+                errorMsg.textContent = 'Please confirm your PIN';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            if (setupPIN !== confirmPIN) {
+                errorMsg.textContent = 'PINs don\'t match. Please try again.';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            settingsPIN = hashPIN(setupPIN);
+            isPINEnabled = true;
+            localStorage.setItem('settingsPIN', settingsPIN);
+            localStorage.setItem('isPINEnabled', 'true');
+
+            clearPINInputs('#pin-setup-section .pin-input-container:first-of-type');
+            confirmInputs.forEach(id => document.getElementById(id).value = '');
+            errorMsg.style.display = 'none';
+            updatePINStatusUI();
+            showToast('PIN saved successfully');
+        });
+    }
+
+    // Change PIN button
+    const changePINBtn = document.getElementById('change-pin-btn');
+    if (changePINBtn) {
+        changePINBtn.addEventListener('click', async function() {
+            const verified = await showPINDialog();
+            if (verified) {
+                document.getElementById('pin-change-section').style.display = 'none';
+                document.getElementById('pin-setup-section').style.display = 'block';
+                setTimeout(() => {
+                    const firstInput = document.getElementById('pin-setup-1');
+                    if (firstInput) firstInput.focus();
+                }, 100);
+            }
+        });
+    }
+
+    // Remove PIN button
+    const removePINBtn = document.getElementById('remove-pin-btn');
+    if (removePINBtn) {
+        removePINBtn.addEventListener('click', async function() {
+            const confirmed = await showConfirmDialog('Are you sure you want to remove PIN protection?');
+            if (confirmed) {
+                settingsPIN = null;
+                isPINEnabled = false;
+                localStorage.removeItem('settingsPIN');
+                localStorage.removeItem('isPINEnabled');
+                pinVerified = false;
+                updatePINStatusUI();
+                showToast('PIN protection removed');
+            }
+        });
+    }
+
+    // Intercept Settings navigation with PIN check
+    const settingsNavItem = document.querySelector('[data-screen="settings-screen"]');
+    if (settingsNavItem) {
+        const originalClickHandler = settingsNavItem.onclick;
+        settingsNavItem.addEventListener('click', async function(e) {
+            if (isPINEnabled && !pinVerified) {
+                e.stopImmediatePropagation();
+                const verified = await showPINDialog();
+                if (verified) {
+                    switchScreen('settings-screen');
+                }
+            }
+        });
+    }
+
+    // Reset PIN verification when leaving settings
+    navItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const screenId = this.getAttribute('data-screen');
+            if (screenId !== 'settings-screen') {
+                pinVerified = false;
+            }
+        });
+    });
+
     // ==================== REFRESH CHIP SELECTORS ====================
 
     function refreshCategoryChips() {

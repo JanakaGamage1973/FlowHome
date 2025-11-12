@@ -505,6 +505,19 @@
                         </svg>
                     </div>
 
+                    <div class="settings-item" data-subscreen="pin-security-screen">
+                        <div class="settings-item-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                        </div>
+                        <span class="settings-item-label">PIN Security</span>
+                        <svg class="settings-item-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
+
                     <div class="settings-item disabled">
                         <div class="settings-item-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -974,6 +987,83 @@
                 </div>
             </div>
 
+            <!-- PIN Security Sub-Screen -->
+            <div class="screen sub-screen" id="pin-security-screen">
+                <div class="screen-header">
+                    <button class="back-button" data-back="settings-screen">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
+                    <h1>PIN Security</h1>
+                </div>
+                <div class="form-container">
+                    <div class="form-group">
+                        <label>PIN Protection Status</label>
+                        <div class="pin-status-container">
+                            <div class="pin-status-info">
+                                <span id="pin-status-text">PIN protection is disabled</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="pin-enabled-toggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <p class="form-description">Enable PIN protection to secure Settings access</p>
+                    </div>
+
+                    <div id="pin-setup-section" style="display: none;">
+                        <div class="form-group">
+                            <label for="pin-setup-input">Set Your 4-Digit PIN</label>
+                            <p class="form-description">Choose a PIN that you'll remember. You'll need this to access Settings.</p>
+                            <div class="pin-input-container">
+                                <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="pin-input" id="pin-setup-1">
+                                <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="pin-input" id="pin-setup-2">
+                                <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="pin-input" id="pin-setup-3">
+                                <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="pin-input" id="pin-setup-4">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pin-confirm-input">Confirm Your PIN</label>
+                            <div class="pin-input-container">
+                                <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="pin-input" id="pin-confirm-1">
+                                <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="pin-input" id="pin-confirm-2">
+                                <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="pin-input" id="pin-confirm-3">
+                                <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="pin-input" id="pin-confirm-4">
+                            </div>
+                            <p class="pin-error-message" id="pin-setup-error" style="display: none;">PINs don't match. Please try again.</p>
+                        </div>
+
+                        <div class="form-actions">
+                            <button class="save-button" id="save-pin-btn">Save PIN</button>
+                        </div>
+                    </div>
+
+                    <div id="pin-change-section" style="display: none;">
+                        <div class="form-group">
+                            <button class="secondary-button" id="change-pin-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px; margin-right: 8px;">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                                Change PIN
+                            </button>
+                        </div>
+
+                        <div class="form-group">
+                            <button class="secondary-button" id="remove-pin-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px; margin-right: 8px;">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                                Remove PIN Protection
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Edit Entry Screen -->
             <div class="screen sub-screen" id="edit-entry-screen">
                 <div class="screen-header">
@@ -1248,6 +1338,35 @@
             <div class="confirm-dialog-buttons">
                 <button class="confirm-dialog-btn cancel-btn" id="confirm-cancel-btn">Cancel</button>
                 <button class="confirm-dialog-btn confirm-btn" id="confirm-ok-btn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PIN Entry Dialog -->
+    <div class="pin-dialog-overlay" id="pin-dialog-overlay">
+        <div class="pin-dialog">
+            <div class="pin-dialog-header">
+                <h3 id="pin-dialog-title">Enter PIN</h3>
+                <button class="pin-dialog-close" id="pin-dialog-close">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="pin-dialog-content">
+                <p class="pin-dialog-message" id="pin-dialog-message">Enter your 4-digit PIN to access Settings</p>
+                <div class="pin-input-container">
+                    <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="pin-input" id="pin-digit-1">
+                    <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="pin-input" id="pin-digit-2">
+                    <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="pin-input" id="pin-digit-3">
+                    <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="pin-input" id="pin-digit-4">
+                </div>
+                <p class="pin-error-message" id="pin-error-message" style="display: none;">Incorrect PIN. Please try again.</p>
+            </div>
+            <div class="pin-dialog-buttons">
+                <button class="pin-dialog-btn secondary" id="pin-cancel-btn">Cancel</button>
+                <button class="pin-dialog-btn primary" id="pin-verify-btn">Verify</button>
             </div>
         </div>
     </div>

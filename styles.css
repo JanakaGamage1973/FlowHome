@@ -1083,6 +1083,233 @@ body {
     background-color: rgba(217, 79, 61, 0.1);
 }
 
+/* PIN Dialog */
+.pin-dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.pin-dialog-overlay.show {
+    display: flex;
+    opacity: 1;
+}
+
+.pin-dialog {
+    background-color: var(--md-surface-1);
+    border-radius: var(--md-radius-lg);
+    padding: 0;
+    max-width: 380px;
+    width: 90%;
+    box-shadow: var(--md-elevation-4);
+    transform: scale(0.9);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pin-dialog-overlay.show .pin-dialog {
+    transform: scale(1);
+}
+
+.pin-dialog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-bottom: 1px solid var(--md-surface-3);
+}
+
+.pin-dialog-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--md-on-surface);
+    margin: 0;
+}
+
+.pin-dialog-close {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.pin-dialog-close svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--md-on-surface-variant);
+}
+
+.pin-dialog-close:active {
+    background-color: var(--md-surface-2);
+}
+
+.pin-dialog-content {
+    padding: var(--spacing-xl);
+}
+
+.pin-dialog-message {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--md-on-surface-variant);
+    margin: 0 0 var(--spacing-lg) 0;
+    text-align: center;
+}
+
+.pin-input-container {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+    margin: var(--spacing-md) 0;
+}
+
+.pin-input {
+    width: 50px;
+    height: 60px;
+    font-size: 24px;
+    font-weight: 600;
+    text-align: center;
+    border: 2px solid var(--md-surface-3);
+    border-radius: var(--md-radius-md);
+    background-color: var(--md-surface-2);
+    color: var(--md-on-surface);
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.pin-input:focus {
+    outline: none;
+    border-color: var(--md-primary);
+    background-color: var(--md-surface-1);
+    box-shadow: 0 0 0 3px rgba(107, 155, 142, 0.1);
+}
+
+.pin-error-message {
+    font-size: 13px;
+    color: var(--md-error);
+    text-align: center;
+    margin-top: var(--spacing-sm);
+}
+
+.pin-dialog-buttons {
+    display: flex;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-top: 1px solid var(--md-surface-3);
+}
+
+.pin-dialog-btn {
+    flex: 1;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: none;
+    border-radius: var(--md-radius-full);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    -webkit-tap-highlight-color: transparent;
+}
+
+.pin-dialog-btn.secondary {
+    background-color: var(--md-surface-3);
+    color: var(--md-on-surface);
+}
+
+.pin-dialog-btn.secondary:active {
+    transform: scale(0.96);
+    background-color: var(--md-surface-2);
+}
+
+.pin-dialog-btn.primary {
+    background-color: var(--md-primary);
+    color: var(--md-on-primary);
+    box-shadow: var(--md-elevation-2);
+}
+
+.pin-dialog-btn.primary:active {
+    transform: scale(0.96);
+    background-color: var(--md-primary-dark);
+    box-shadow: var(--md-elevation-1);
+}
+
+/* PIN Status Container */
+.pin-status-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-md);
+    background-color: var(--md-surface-2);
+    border-radius: var(--md-radius-md);
+    margin-top: var(--spacing-sm);
+}
+
+.pin-status-info span {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--md-on-surface);
+}
+
+/* Toggle Switch */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 28px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--md-surface-3);
+    transition: 0.3s;
+    border-radius: 28px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background-color: var(--md-primary);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(20px);
+}
+
 /* Responsive adjustments for Settings */
 @media (max-width: 375px) {
     .settings-item {
