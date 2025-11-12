@@ -1358,18 +1358,18 @@ body {
     align-items: center;
     justify-content: center;
     gap: var(--spacing-sm);
-    padding: var(--spacing-lg) var(--spacing-2xl);
+    padding: var(--spacing-md) var(--spacing-xl);
     background-color: var(--md-accent);
     color: var(--md-on-accent);
     border: none;
     border-radius: var(--md-radius-full);
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 16px;
+    font-weight: 600;
     cursor: pointer;
     margin-top: var(--spacing-md);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     -webkit-tap-highlight-color: transparent;
-    box-shadow: var(--md-elevation-3);
+    box-shadow: var(--md-elevation-2);
 }
 
 .save-expense-button:hover {
