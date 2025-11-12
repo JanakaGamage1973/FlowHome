@@ -2168,6 +2168,131 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 500);
     }
 
+    // ==================== APP ICON FUNCTIONALITY ====================
+
+    // Store custom app icon in localStorage
+    let customAppIcon = localStorage.getItem('customAppIcon') || null;
+
+    // Load custom icon on page load
+    function loadCustomIcon() {
+        const previewImg = document.getElementById('app-icon-preview-img');
+        const linkIcon = document.querySelector('link[rel="icon"]');
+        const appleTouchIcon = document.querySelector('link[rel="apple-touch-icon"]');
+
+        if (customAppIcon) {
+            if (previewImg) {
+                previewImg.src = customAppIcon;
+            }
+            if (linkIcon) {
+                linkIcon.href = customAppIcon;
+            }
+            if (appleTouchIcon) {
+                appleTouchIcon.href = customAppIcon;
+            }
+        }
+    }
+
+    // Initialize icon on page load
+    loadCustomIcon();
+
+    // Upload icon button
+    const uploadIconBtn = document.getElementById('upload-icon-btn');
+    const appIconInput = document.getElementById('app-icon-input');
+
+    if (uploadIconBtn && appIconInput) {
+        uploadIconBtn.addEventListener('click', function() {
+            appIconInput.click();
+        });
+
+        appIconInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+
+                reader.onload = function(event) {
+                    const imageData = event.target.result;
+                    const previewImg = document.getElementById('app-icon-preview-img');
+
+                    if (previewImg) {
+                        previewImg.src = imageData;
+                    }
+
+                    // Store temporarily (will be saved when user clicks Save)
+                    customAppIcon = imageData;
+                };
+
+                reader.readAsDataURL(file);
+            } else {
+                showToast('Please select a valid image file');
+            }
+        });
+    }
+
+    // Reset icon button
+    const resetIconBtn = document.getElementById('reset-icon-btn');
+    if (resetIconBtn) {
+        resetIconBtn.addEventListener('click', function() {
+            const previewImg = document.getElementById('app-icon-preview-img');
+            if (previewImg) {
+                previewImg.src = 'icon.svg';
+            }
+            customAppIcon = null;
+            showToast('Icon reset to default');
+        });
+    }
+
+    // Save icon button
+    const saveAppIconBtn = document.getElementById('save-app-icon-btn');
+    if (saveAppIconBtn) {
+        saveAppIconBtn.addEventListener('click', function() {
+            if (customAppIcon) {
+                localStorage.setItem('customAppIcon', customAppIcon);
+            } else {
+                localStorage.removeItem('customAppIcon');
+            }
+
+            // Update all icon references
+            loadCustomIcon();
+
+            // Update PWA manifest dynamically (if supported)
+            updateManifestIcon();
+
+            showToast('Icon saved successfully');
+            setTimeout(() => {
+                switchScreen('settings-screen');
+            }, 500);
+        });
+    }
+
+    // Update manifest icon dynamically
+    function updateManifestIcon() {
+        try {
+            // For PWA, update the manifest link dynamically
+            const manifestLink = document.querySelector('link[rel="manifest"]');
+            if (manifestLink && customAppIcon) {
+                // Create a new manifest object with updated icon
+                fetch('manifest.json')
+                    .then(response => response.json())
+                    .then(manifest => {
+                        manifest.icons = [{
+                            src: customAppIcon,
+                            sizes: '512x512',
+                            type: 'image/png',
+                            purpose: 'any maskable'
+                        }];
+
+                        // Convert manifest to blob URL
+                        const manifestBlob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+                        const manifestURL = URL.createObjectURL(manifestBlob);
+                        manifestLink.href = manifestURL;
+                    })
+                    .catch(err => console.log('Manifest update skipped:', err));
+            }
+        } catch (err) {
+            console.log('Manifest update not supported:', err);
+        }
+    }
+
     // ==================== REFRESH CHIP SELECTORS ====================
 
     function refreshCategoryChips() {

@@ -912,6 +912,66 @@ body {
     stroke: currentColor;
 }
 
+/* Secondary Button */
+.secondary-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-md) var(--spacing-xl);
+    background-color: var(--md-surface-3);
+    color: var(--md-on-surface);
+    border: 2px solid var(--md-surface-3);
+    border-radius: var(--md-radius-full);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: var(--spacing-sm);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    -webkit-tap-highlight-color: transparent;
+    width: 100%;
+}
+
+.secondary-button:hover {
+    background-color: var(--md-surface-2);
+    border-color: var(--md-primary);
+}
+
+.secondary-button:active {
+    transform: scale(0.98);
+    background-color: var(--md-surface-3);
+}
+
+/* Form Description */
+.form-description {
+    font-size: 13px;
+    color: var(--md-on-surface-variant);
+    line-height: 1.5;
+    margin-top: 4px;
+}
+
+/* App Icon Preview */
+.app-icon-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 150px;
+    height: 150px;
+    margin: var(--spacing-md) auto;
+    padding: var(--spacing-md);
+    background-color: var(--md-surface-2);
+    border: 2px solid var(--md-surface-3);
+    border-radius: var(--md-radius-xl);
+    box-shadow: var(--md-elevation-2);
+}
+
+.app-icon-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: var(--md-radius-md);
+}
+
 /* Toast Notification */
 .toast {
     position: fixed;
