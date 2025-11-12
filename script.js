@@ -869,12 +869,12 @@ document.addEventListener('DOMContentLoaded', function() {
             let transactionLabel = '';
 
             if (expense.isTransfer) {
-                // Wallet transactions (transfers) - use source wallet color
-                thumbnailColor = expense.source.color;
+                // Wallet transactions (transfers) - use theme primary color for easy identification
+                thumbnailColor = '#6B9B8E'; // Theme teal/sage color for all wallet transactions
                 transactionLabel = 'Transfer';
             } else if (expense.isDeposit) {
-                // Wallet transactions (deposits) - use source wallet color
-                thumbnailColor = expense.source.color;
+                // Wallet transactions (deposits) - use theme primary color for easy identification
+                thumbnailColor = '#6B9B8E'; // Theme teal/sage color for all wallet transactions
                 transactionLabel = 'Deposit';
             } else {
                 // Regular expenses - use category color
@@ -1373,7 +1373,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 badge = '';
             }
 
-            const bgColor = transaction.isTransfer ? '#007AFF' : (transaction.isDeposit ? '#4A9C4A' : transaction.category.color);
+            const bgColor = transaction.isTransfer ? '#6B9B8E' : (transaction.isDeposit ? '#6B9B8E' : transaction.category.color);
 
             item.innerHTML = `
                 <div class="wallet-transaction-icon" style="background-color: ${bgColor};">
@@ -2600,11 +2600,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (expense.isTransfer) {
             categoryDisplay = 'Transfer';
             categoryIcon = '🔄';
-            thumbnailColor = expense.source.color; // Use source wallet color
+            thumbnailColor = '#6B9B8E'; // Theme teal/sage color for all wallet transactions
         } else if (expense.isDeposit) {
             categoryDisplay = 'Deposit';
             categoryIcon = expense.category.icon;
-            thumbnailColor = expense.source.color; // Use source wallet color
+            thumbnailColor = '#6B9B8E'; // Theme teal/sage color for all wallet transactions
         } else {
             thumbnailColor = expense.category.color; // Use category color
         }
